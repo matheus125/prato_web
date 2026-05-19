@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recuperar senha | Prato Cheio</title>
+
+  <link rel="stylesheet" href="/res/admin/assets/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --panel-dark: rgba(17, 24, 39, 0.92);
+      --brand: #ff6b35;
+      --brand-dark: #e85a2a;
+      --brand-light: #ff8a5c;
+      --text-white: #f8fafc;
+      --text-soft: #cbd5e1;
+      --text-muted: #94a3b8;
+      --input-bg: rgba(255, 255, 255, 0.04);
+      --input-border: rgba(255, 255, 255, 0.10);
+      --shadow-main: 0 30px 80px rgba(0, 0, 0, 0.45);
+      --shadow-brand: 0 18px 38px rgba(255, 107, 53, 0.28);
+      --radius-xl: 30px;
+      --transition: all 0.25s ease;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(255, 107, 53, 0.16), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(59, 130, 246, 0.10), transparent 30%),
+        linear-gradient(135deg, rgba(2, 6, 23, 0.92), rgba(15, 23, 42, 0.96)),
+        url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1800&q=80');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 28px;
+      color: var(--text-white);
+      overflow-x: hidden;
+    }
+
+    .page-shell {
+      width: 100%;
+      max-width: 1120px;
+      animation: fadeUp 0.8s ease;
+    }
+
+    .forgot-wrapper {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      width: 100%;
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(14px);
+      box-shadow: var(--shadow-main);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      position: relative;
+    }
+
+    .forgot-brand {
+      position: relative;
+      padding: 54px 46px;
+      background:
+        linear-gradient(160deg, rgba(255, 107, 53, 0.96), rgba(232, 90, 42, 0.86)),
+        linear-gradient(45deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0));
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      animation: slideInLeft 0.7s ease;
+    }
+
+    .forgot-brand::before,
+    .forgot-brand::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .forgot-brand::before {
+      width: 340px;
+      height: 340px;
+      right: -110px;
+      top: -110px;
+      background: rgba(255, 255, 255, 0.08);
+      filter: blur(8px);
+    }
+
+    .forgot-brand::after {
+      width: 220px;
+      height: 220px;
+      left: -60px;
+      bottom: -60px;
+      background: rgba(255, 255, 255, 0.08);
+      filter: blur(8px);
+    }
+
+    .brand-top,
+    .brand-bottom {
+      position: relative;
+      z-index: 2;
+    }
+
+    .logo-brand {
+      margin-bottom: 22px;
+      animation: floating 3s ease-in-out infinite;
+    }
+
+    .logo-brand img {
+      width: 190px;
+      max-width: 100%;
+      height: auto;
+      display: block;
+      background: rgba(255, 255, 255, 0.12);
+      padding: 10px;
+      border-radius: 20px;
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.18);
+    }
+
+    .brand-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 18px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 24px;
+    }
+
+    .brand-title {
+      margin: 0 0 16px;
+      font-size: 46px;
+      line-height: 1.04;
+      font-weight: bold;
+      letter-spacing: -1px;
+    }
+
+    .brand-text {
+      margin: 0;
+      max-width: 500px;
+      font-size: 16px;
+      line-height: 1.8;
+      color: rgba(255, 255, 255, 0.95);
+    }
+
+    .brand-steps {
+      display: grid;
+      gap: 14px;
+      margin-top: 32px;
+    }
+
+    .brand-step {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 18px;
+      padding: 16px;
+      transition: var(--transition);
+    }
+
+    .brand-step:hover {
+      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.16);
+    }
+
+    .brand-step strong {
+      display: block;
+      font-size: 17px;
+      margin-bottom: 6px;
+    }
+
+    .brand-step span {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.92);
+      line-height: 1.5;
+    }
+
+    .forgot-panel {
+      background: var(--panel-dark);
+      padding: 54px 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: slideInRight 0.7s ease;
+      position: relative;
+    }
+
+    .forgot-card {
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .logo-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      text-decoration: none;
+      color: var(--text-white);
+      margin-bottom: 14px;
+    }
+
+    .logo-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+      box-shadow: var(--shadow-brand);
+      flex-shrink: 0;
+    }
+
+    .logo-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .logo-text {
+      font-size: 30px;
+      font-weight: bold;
+      line-height: 1.1;
+      color: var(--text-white);
+    }
+
+    .forgot-subtitle {
+      margin: 0 0 28px;
+      color: var(--text-soft);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .alert {
+      border-radius: 18px;
+      padding: 14px 16px;
+      margin-bottom: 18px;
+      border: none;
+      font-size: 14px;
+    }
+
+    .alert-danger {
+      background: linear-gradient(135deg, rgba(220, 53, 69, 0.16), rgba(220, 53, 69, 0.08));
+      color: #ffc2c7;
+    }
+
+    .alert-success {
+      background: linear-gradient(135deg, rgba(34, 197, 94, 0.16), rgba(34, 197, 94, 0.08));
+      color: #bbf7d0;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-label-title {
+      display: block;
+      margin-bottom: 8px;
+      color: #e2e8f0;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .input-group-custom {
+      position: relative;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 15px;
+      z-index: 2;
+      transition: var(--transition);
+    }
+
+    .form-control-custom {
+      width: 100%;
+      height: 58px;
+      border: 1px solid var(--input-border);
+      border-radius: 18px;
+      padding: 0 16px 0 48px;
+      font-size: 16px;
+      background: var(--input-bg);
+      outline: none;
+      transition: var(--transition);
+      color: var(--text-white);
+    }
+
+    .form-control-custom::placeholder {
+      color: #94a3b8;
+    }
+
+    .form-control-custom:focus {
+      border-color: rgba(255, 107, 53, 0.9);
+      box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.15);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .input-group-custom:focus-within .input-icon {
+      color: var(--brand-light);
+    }
+
+    .cpf-feedback {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      font-size: 13px;
+      animation: alertFade 0.25s ease;
+    }
+
+    .cpf-feedback.show {
+      display: flex;
+    }
+
+    .cpf-feedback.valid {
+      background: rgba(34, 197, 94, 0.12);
+      border: 1px solid rgba(34, 197, 94, 0.22);
+      color: #4ade80;
+    }
+
+    .cpf-feedback.invalid {
+      background: rgba(220, 53, 69, 0.12);
+      border: 1px solid rgba(220, 53, 69, 0.22);
+      color: #ff8a8a;
+    }
+
+    .cpf-valid .form-control-custom {
+      border-color: rgba(34, 197, 94, 0.65);
+      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.10);
+    }
+
+    .cpf-invalid .form-control-custom {
+      border-color: rgba(220, 53, 69, 0.75);
+      box-shadow: 0 0 0 4px rgba(220, 53, 69, 0.10);
+    }
+
+    .btn-main {
+      width: 100%;
+      height: 58px;
+      border: none;
+      border-radius: 18px;
+      background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+      color: #fff;
+      font-size: 18px;
+      font-weight: bold;
+      box-shadow: var(--shadow-brand);
+      cursor: pointer;
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-main::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.18), transparent);
+      transform: translateX(-100%);
+      transition: transform 0.7s ease;
+    }
+
+    .btn-main:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 22px 36px rgba(255, 107, 53, 0.34);
+    }
+
+    .btn-main:hover::before {
+      transform: translateX(100%);
+    }
+
+    .btn-main:disabled {
+      opacity: 0.95;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-text,
+    .btn-loader {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-loader {
+      display: none;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .btn-main.loading .btn-text {
+      display: none;
+    }
+
+    .btn-main.loading .btn-loader {
+      display: inline-flex;
+    }
+
+    .spinner-main {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255, 255, 255, 0.45);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    .bottom-links {
+      margin-top: 22px;
+      text-align: center;
+    }
+
+    .bottom-links a {
+      color: var(--brand-light);
+      font-size: 15px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: var(--transition);
+    }
+
+    .bottom-links a:hover {
+      color: #fff;
+      text-decoration: underline;
+    }
+
+    .mini-note {
+      margin-top: 18px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(24px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideInLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-30px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes slideInRight {
+      from {
+        opacity: 0;
+        transform: translateX(30px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes floating {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-4px);
+      }
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes alertFade {
+      from {
+        opacity: 0;
+        transform: translateY(-8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 1080px) {
+      .forgot-wrapper {
+        grid-template-columns: 1fr;
+        max-width: 580px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 16px;
+      }
+
+      .forgot-brand {
+        display: none;
+      }
+
+      .forgot-panel {
+        padding: 32px 22px;
+      }
+
+      .logo-icon {
+        width: 56px;
+        height: 56px;
+      }
+
+      .logo-text {
+        font-size: 24px;
+      }
+
+      .form-control-custom,
+      .btn-main {
+        height: 54px;
+        font-size: 15px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 12px;
+      }
+
+      .forgot-panel {
+        padding: 24px 16px;
+      }
+
+      .logo-text {
+        font-size: 22px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page-shell">
+    <div class="forgot-wrapper">
+
+      <section class="forgot-brand">
+        <div class="brand-top">
+          <div class="logo-brand">
+            <img src="/res/admin/assets/img/logo-prato-cheio.png" alt="Logo">
+          </div>
+
+          <div class="brand-badge">
+            <i class="fas fa-key"></i>
+            Recuperação segura de acesso
+          </div>
+
+          <h1 class="brand-title">RECUPERAR SENHA</h1>
+
+          <p class="brand-text">
+            Informe seu CPF para iniciar a recuperação de acesso ao painel administrativo do Prato Cheio.
+          </p>
+        </div>
+
+        <div class="brand-bottom">
+          <div class="brand-steps">
+            <div class="brand-step">
+              <strong>1. Informe seu CPF</strong>
+              <span>Use o CPF cadastrado na sua conta.</span>
+            </div>
+            <div class="brand-step">
+              <strong>2. Validação do cadastro</strong>
+              <span>O sistema verifica se o usuário está registrado.</span>
+            </div>
+            <div class="brand-step">
+              <strong>3. Próximo passo</strong>
+              <span>Após a validação do CPF, você poderá redefinir sua senha.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="forgot-panel">
+        <div class="forgot-card">
+
+          <a href="/admin/login" class="logo-link">
+            <span class="logo-icon">
+              <img src="/res/admin/assets/img/logo-prato-cheio.png" alt="Logo">
+            </span>
+            <span class="logo-text">Prato Cheio</span>
+          </a>
+
+          <p class="forgot-subtitle">
+            Digite seu CPF para continuar o processo de recuperação de senha.
+          </p>
+
+          {if="$error != ''"}
+          <div class="alert alert-danger">
+            {$error}
+          </div>
+          {/if}
+
+          {if="$success != ''"}
+          <div class="alert alert-success">
+            {$success}
+          </div>
+          {/if}
+
+          <form action="/admin/forgot" method="post" id="forgotForm">
+
+            <div class="form-group">
+              <label for="cpf" class="form-label-title">CPF</label>
+              <div class="input-group-custom" id="cpfGroup">
+                <i class="fas fa-id-card input-icon"></i>
+                <input type="text" class="form-control-custom" id="cpf" name="cpf" placeholder="Digite seu CPF"
+                  maxlength="14" oninput="formatCPF(this); validateCPFField(this)" autocomplete="username" required>
+              </div>
+
+              <div class="cpf-feedback" id="cpfFeedback">
+                <i class="fas fa-circle-info"></i>
+                <span>Digite um CPF válido.</span>
+              </div>
+            </div>
+
+            <button type="submit" class="btn-main" id="submitButton">
+              <span class="btn-text">Continuar</span>
+              <span class="btn-loader">
+                <span class="spinner-main"></span>
+                Processando...
+              </span>
+            </button>
+
+            <div class="bottom-links">
+              <a href="/admin/login">Voltar ao login</a>
+            </div>
+
+            <div class="mini-note">
+              Recuperação disponível apenas para usuários cadastrados.
+            </div>
+          </form>
+
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <script>
+    function formatCPF(input) {
+      let value = input.value.replace(/\D/g, '');
+
+      if (value.length > 11) {
+        value = value.slice(0, 11);
+      }
+
+      value = value.replace(/(\d{3})(\d)/, '$1.$2');
+      value = value.replace(/(\d{3})(\d)/, '$1.$2');
+      value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+
+      input.value = value;
+    }
+
+    const cpfGroup = document.getElementById('cpfGroup');
+    const cpfFeedback = document.getElementById('cpfFeedback');
+    const forgotForm = document.getElementById('forgotForm');
+    const submitButton = document.getElementById('submitButton');
+
+    function isValidCPF(cpf) {
+      cpf = cpf.replace(/\D/g, '');
+
+      if (cpf.length !== 11) return false;
+      if (/^(\d)\1+$/.test(cpf)) return false;
+
+      let sum = 0;
+      for (let i = 0; i < 9; i++) {
+        sum += parseInt(cpf.charAt(i)) * (10 - i);
+      }
+
+      let rev = 11 - (sum % 11);
+      if (rev === 10 || rev === 11) rev = 0;
+      if (rev !== parseInt(cpf.charAt(9))) return false;
+
+      sum = 0;
+      for (let i = 0; i < 10; i++) {
+        sum += parseInt(cpf.charAt(i)) * (11 - i);
+      }
+
+      rev = 11 - (sum % 11);
+      if (rev === 10 || rev === 11) rev = 0;
+      if (rev !== parseInt(cpf.charAt(10))) return false;
+
+      return true;
+    }
+
+    function validateCPFField(input) {
+      if (!cpfGroup || !cpfFeedback) return;
+
+      const cpf = input.value.replace(/\D/g, '');
+
+      cpfGroup.classList.remove('cpf-valid', 'cpf-invalid');
+      cpfFeedback.classList.remove('show', 'valid', 'invalid');
+
+      if (cpf.length === 0) return;
+
+      if (cpf.length < 11) {
+        cpfFeedback.classList.add('show', 'invalid');
+        cpfFeedback.innerHTML = '<i class="fas fa-circle-info"></i><span>CPF incompleto.</span>';
+        return;
+      }
+
+      if (isValidCPF(cpf)) {
+        cpfGroup.classList.add('cpf-valid');
+        cpfFeedback.classList.add('show', 'valid');
+        cpfFeedback.innerHTML = '<i class="fas fa-circle-check"></i><span>CPF válido.</span>';
+      } else {
+        cpfGroup.classList.add('cpf-invalid');
+        cpfFeedback.classList.add('show', 'invalid');
+        cpfFeedback.innerHTML = '<i class="fas fa-circle-xmark"></i><span>CPF inválido.</span>';
+      }
+    }
+
+    if (forgotForm && submitButton) {
+      forgotForm.addEventListener('submit', function () {
+        submitButton.classList.add('loading');
+        submitButton.disabled = true;
+      });
+    }
+  </script>
+
+</body>
+
+</html>

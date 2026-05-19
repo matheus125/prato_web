@@ -1,0 +1,216 @@
+<style>
+  .campo-obrigatorio::after {
+    content: " *";
+    color: #dc3545;
+    font-weight: 700;
+  }
+
+  .socio-form-card {
+    border-radius: 12px;
+    overflow: hidden;
+  }
+</style>
+
+<div class="card card-info card-outline mb-4 socio-form-card">
+  <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <h3 class="card-title text-info mb-0">
+      <i class="bi bi-heart-pulse"></i> {$formTitle}
+    </h3>
+    <a href="/admin/socio-economico-saude" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-arrow-left me-1"></i> Voltar
+    </a>
+  </div>
+
+  <div class="card-body pb-0">
+    {if="$msgSuccess != ''"}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      {$msgSuccess}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {/if}
+
+    {if="$msgError != ''"}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      {$msgError}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {/if}
+  </div>
+
+  <form action="{$formAction}" method="post" class="needs-validation" novalidate>
+    <input type="hidden" name="id" value="{$registro.id}">
+
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-12">
+          <h5 class="text-info border-bottom pb-2">
+            <i class="bi bi-person"></i> Pessoa atendida
+          </h5>
+        </div>
+
+        <div class="col-md-8">
+          <label class="form-label campo-obrigatorio">Titular</label>
+          <select class="form-select form-select-sm" id="id_titular" name="id_titular" required>
+            <option value="">Selecione</option>
+            {loop="$titulares"}
+            <option value="{$value.id}" {if="$value.id == $registro.id_titular"}selected{/if}>
+              {$value.nome_completo} - {$value.cpf}
+            </option>
+            {/loop}
+          </select>
+          <div class="invalid-feedback">Selecione um titular.</div>
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label campo-obrigatorio">Tipo de pessoa</label>
+          <div class="d-flex gap-3 pt-1">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="tipo_pessoa" id="tipo_titular" value="titular"
+                {if="$registro.tipo_pessoa == 'titular'"}checked{/if}>
+              <label class="form-check-label" for="tipo_titular">Titular</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="tipo_pessoa" id="tipo_dependente" value="dependente"
+                {if="$registro.tipo_pessoa == 'dependente'"}checked{/if}>
+              <label class="form-check-label" for="tipo_dependente">Dependente</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-8" id="campoDependente">
+          <label class="form-label">Dependente</label>
+          <select class="form-select form-select-sm" id="id_dependente" name="id_dependente">
+            <option value="">Selecione</option>
+            {loop="$dependentes"}
+            <option value="{$value.id}" data-titular="{$value.id_titular}" {if="$value.id == $registro.id_dependente"}selected{/if}>
+              {$value.nome} - {$value.titular_nome}
+            </option>
+            {/loop}
+          </select>
+          <div class="invalid-feedback">Selecione um dependente.</div>
+        </div>
+
+        <div class="col-12 mt-3">
+          <h5 class="text-info border-bottom pb-2">
+            <i class="bi bi-clipboard2-pulse"></i> Saude
+          </h5>
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label">Doenca</label>
+          <input type="text" class="form-control form-control-sm" name="doenca" value="{$registro.doenca}">
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label">Outras doencas</label>
+          <input type="text" class="form-control form-control-sm" name="outras_Doencas"
+            value="{$registro.outras_Doencas}">
+        </div>
+
+        <div class="col-md-2">
+          <label class="form-label">Deficiencia</label>
+          <select class="form-select form-select-sm" name="deficiencia">
+            <option value="">Selecione</option>
+            <option value="Sim" {if="$registro.deficiencia == 'Sim'"}selected{/if}>Sim</option>
+            <option value="Nao" {if="$registro.deficiencia == 'Nao'"}selected{/if}>Nao</option>
+          </select>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Justificativa deficiencia</label>
+          <input type="text" class="form-control form-control-sm" name="justificativa_Deficiencia"
+            value="{$registro.justificativa_Deficiencia}">
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Laudo</label>
+          <input type="text" class="form-control form-control-sm" name="laudo" value="{$registro.laudo}">
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">Observacao</label>
+          <textarea class="form-control form-control-sm" name="observacao" rows="3">{$registro.observacao}</textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-footer d-flex gap-2 justify-content-end">
+      <a href="/admin/socio-economico-saude" class="btn btn-secondary btn-sm">
+        <i class="bi bi-x-circle me-1"></i> Cancelar
+      </a>
+      <button type="submit" class="btn btn-primary btn-sm">
+        <i class="bi bi-check-circle me-1"></i> {$buttonText}
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+  (function () {
+    const titularSelect = document.getElementById('id_titular');
+    const dependenteSelect = document.getElementById('id_dependente');
+    const campoDependente = document.getElementById('campoDependente');
+    const tipoRadios = document.querySelectorAll('input[name="tipo_pessoa"]');
+
+    function tipoSelecionado() {
+      const checked = document.querySelector('input[name="tipo_pessoa"]:checked');
+      return checked ? checked.value : 'titular';
+    }
+
+    function atualizarDependentes() {
+      const titularId = titularSelect ? titularSelect.value : '';
+      const usaDependente = tipoSelecionado() === 'dependente';
+
+      if (!dependenteSelect || !campoDependente) return;
+
+      campoDependente.style.display = usaDependente ? '' : 'none';
+      dependenteSelect.required = usaDependente;
+      dependenteSelect.disabled = !usaDependente;
+
+      Array.from(dependenteSelect.options).forEach(function (option) {
+        if (!option.value) {
+          option.hidden = false;
+          option.disabled = false;
+          return;
+        }
+
+        const pertenceAoTitular = option.getAttribute('data-titular') === titularId;
+        option.hidden = !pertenceAoTitular;
+        option.disabled = !pertenceAoTitular;
+      });
+
+      if (!usaDependente) {
+        dependenteSelect.value = '';
+        return;
+      }
+
+      const selected = dependenteSelect.options[dependenteSelect.selectedIndex];
+      if (selected && selected.value && selected.disabled) {
+        dependenteSelect.value = '';
+      }
+    }
+
+    if (titularSelect) {
+      titularSelect.addEventListener('change', atualizarDependentes);
+    }
+
+    tipoRadios.forEach(function (radio) {
+      radio.addEventListener('change', atualizarDependentes);
+    });
+
+    atualizarDependentes();
+
+    document.querySelectorAll('.needs-validation').forEach(function (form) {
+      form.addEventListener('submit', function (event) {
+        atualizarDependentes();
+
+        if (!form.checkValidity()) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+
+        form.classList.add('was-validated');
+      }, false);
+    });
+  })();
+</script>

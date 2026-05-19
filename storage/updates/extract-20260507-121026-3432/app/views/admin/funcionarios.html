@@ -1,0 +1,294 @@
+<div class="content-wrapper">
+
+  <!-- Cabeçalho -->
+  <section class="content-header painel-topo">
+    <div class="row">
+      <div class="col-sm-8">
+        <h1>
+          <i class="fa fa-users text-primary"></i> Funcionários
+          <small>Lista de usuários cadastrados</small>
+        </h1>
+      </div>
+
+      <div class="col-sm-4 text-right">
+        <ol class="breadcrumb breadcrumb-custom">
+          <li class="breadcrumb-item">
+            <a href="/admin">
+              <i class="fa fa-dashboard"></i> Home
+            </a>
+          </li>
+          <li class="breadcrumb-item active">
+            <i class="fa fa-users"></i> Funcionários
+          </li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="content">
+
+    <div class="card mb-4 painel-formulario">
+
+      <!-- Header -->
+      <div class="card-header cabecalho-formulario">
+
+        <h3 class="card-title">
+          <i class="fa fa-list"></i> Lista de Funcionários
+        </h3>
+
+        <div class="card-tools">
+
+          {if="canAccess('FUNCIONARIOS_CREATE')"}<a href="/admin/funcionarios/create" class="btn btn-primary btn-sm">
+            <i class="fa fa-plus"></i> Novo Cadastro
+          </a>{/if}
+
+        </div>
+
+      </div>
+
+      <!-- Tabela -->
+      <div class="card-body p-0">
+
+        <table class="table tabela-funcionarios">
+
+          <thead>
+            <tr>
+              <th style="width:80px">ID</th>
+              <th>Nome</th>
+              <th>E-mail</th>
+              <th>Login</th>
+              <th style="width:260px">Ações</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            {loop="$funcionarios"}
+
+            <tr>
+
+              <td>
+                <span class="badge badge-id">
+                  {$value.id_usuario}
+                </span>
+              </td>
+
+              <td>{$value.nome_funcionario}</td>
+
+              <td>{$value.email}</td>
+
+              <td>{$value.cpf}</td>
+
+              <td>
+
+                {if="canAccess('FUNCIONARIOS_UPDATE')"}<a href="/admin/funcionarios/{$value.id_usuario}" class="btn btn-primary btn-xs">
+                  <i class="fa fa-edit"></i> Editar
+                </a>{/if}
+
+                {if="canAccess('FUNCIONARIOS_PASSWORD')"}<a href="/admin/funcionarios/{$value.id_usuario}/password" class="btn btn-warning btn-xs">
+                  <i class="fa fa-unlock"></i> Senha
+                </a>{/if}
+
+                {if="canAccess('FUNCIONARIOS_DELETE')"}<a href="/admin/funcionarios/{$value.id_usuario}/delete"
+                  onclick="return confirm('Deseja realmente excluir este registro?')" class="btn btn-danger btn-xs">
+                  <i class="fa fa-trash"></i> Excluir
+                </a>{/if}
+
+              </td>
+
+            </tr>
+
+            {/loop}
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+  </section>
+
+</div>
+
+/* fundo geral */
+<style>
+  body {
+    background: #f4f6f9;
+  }
+
+  /* cabeçalho */
+
+  .painel-topo {
+    background: #fff;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .painel-topo h1 {
+    margin: 0;
+    font-size: 30px;
+    font-weight: 700;
+    color: #2c3e50;
+  }
+
+  .painel-topo h1 small {
+    display: block;
+    font-size: 14px;
+    color: #7f8c8d;
+    margin-top: 4px;
+  }
+
+  /* card */
+
+  .painel-formulario {
+    border-top: 4px solid #3c8dbc;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    background: #fff;
+  }
+
+  .cabecalho-formulario {
+    background: #f8f9fa;
+    padding: 14px 18px;
+    border-bottom: 1px solid #e5e5e5;
+  }
+
+  .cabecalho-formulario .card-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #2c3e50;
+  }
+
+  .cabecalho-formulario i {
+    margin-right: 6px;
+  }
+
+  /* tabela */
+
+  .tabela-funcionarios thead {
+    background: #f4f6f9;
+  }
+
+  .tabela-funcionarios thead th {
+    font-weight: 600;
+    color: #34495e;
+  }
+
+  .tabela-funcionarios tbody tr:hover {
+    background: #f9fbfd;
+  }
+
+  /* badge id */
+
+  .badge-id {
+    background: #3c8dbc;
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+
+  /* botões */
+
+  .btn-xs {
+    padding: 4px 10px;
+    font-size: 12px;
+  }
+
+  .btn-primary {
+    background: #2e86c1;
+    border-color: #2e86c1;
+  }
+
+  .btn-primary:hover {
+    background: #2874a6;
+  }
+
+  .btn-warning {
+    color: #fff;
+  }
+
+  .btn-danger {
+    background: #e74c3c;
+    border-color: #e74c3c;
+  }
+
+  .btn-danger:hover {
+    background: #c0392b;
+  }
+
+  .painel-topo {
+    background: #fff;
+    padding: 18px 20px 10px 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #dcdcdc;
+  }
+
+  .painel-topo h1 {
+    margin: 0;
+    font-size: 30px;
+    font-weight: 700;
+    color: #2c3e50;
+  }
+
+  .painel-topo h1 small {
+    display: block;
+    margin-top: 6px;
+    font-size: 14px;
+    color: #7f8c8d;
+    font-weight: 400;
+  }
+
+  .breadcrumb-custom {
+    background: transparent;
+    margin: 18px 0 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .breadcrumb-custom li {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+  }
+
+  .breadcrumb-custom li+li::before {
+    content: ">";
+    color: #999;
+    margin-right: 8px;
+  }
+
+  .breadcrumb-custom a {
+    color: #3c8dbc;
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .breadcrumb-custom a:hover {
+    text-decoration: underline;
+  }
+
+  .breadcrumb-custom .active {
+    color: #555;
+    font-weight: 600;
+  }
+
+  @media (max-width: 767px) {
+    .painel-topo h1 {
+      font-size: 24px;
+    }
+
+    .breadcrumb-custom {
+      justify-content: flex-start;
+      margin-top: 12px;
+    }
+  }
+</style>

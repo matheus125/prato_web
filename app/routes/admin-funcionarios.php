@@ -1,0 +1,277 @@
+<?php
+
+use \Hcode\PageAdmin;
+use \Hcode\Model\Funcionarios;
+use \Hcode\DB\Sql;
+use Hcode\Model\Message;
+
+if (!function_exists('normalizarPostUtf8')) {
+	function normalizarPostUtf8(array $data): array
+	{
+		foreach ($data as $key => $value) {
+			if (is_array($value)) {
+				$data[$key] = normalizarPostUtf8($value);
+				continue;
+			}
+
+			if (!is_string($value)) {
+				continue;
+			}
+
+			$value = trim($value);
+
+			if ($value === '') {
+				$data[$key] = $value;
+				continue;
+			}
+
+			if (!mb_check_encoding($value, 'UTF-8')) {
+				$value = mb_convert_encoding($value, 'UTF-8', 'Windows-1252,ISO-8859-1,UTF-8');
+			}
+
+			$data[$key] = $value;
+		}
+
+		return $data;
+	}
+}
+
+$app->get("/admin/funcionarios/:id_usuario/password", function ($id_usuario) {
+
+	Funcionarios::checkPermission('FUNCIONARIOS_PASSWORD');
+
+	$funcionarios = new Funcionarios();
+
+	$funcionarios->get((int)$id_usuario);
+
+	$page = new PageAdmin();
+
+	$page->setTpl("funcionarios-password", [
+		"funcionarios" => $funcionarios->getValues(),
+		"msgError" => Funcionarios::getError(),
+		"msgSuccess" => Funcionarios::getSuccess()
+	]);
+});
+
+$app->post("/admin/funcionarios/:id_usuario/password", function ($id_usuario) {
+
+	Funcionarios::checkPermission('FUNCIONARIOS_PASSWORD');
+
+	if (!isset($_POST['senha']) || $_POST['senha'] === '') {
+		Funcionarios::setError("Preencha a nova senha.");
+		header("Location: /admin/funcionarios/$id_usuario/password");
+		exit;
+	}
+
+	if (strlen(trim($_POST['senha'])) < 6) {
+		Funcionarios::setError("A nova senha deve ter pelo menos 6 caracteres.");
+		header("Location: /admin/funcionarios/$id_usuario/password");
+		exit;
+	}
+
+	if (!isset($_POST['senha-confirm']) || $_POST['senha-confirm'] === '') {
+		Funcionarios::setError("Preencha a confirmação da nova senha.");
+		header("Location: /admin/funcionarios/$id_usuario/password");
+		exit;
+	}
+
+	if ($_POST['senha'] !== $_POST['senha-confirm']) {
+		Funcionarios::setError("Confirme corretamente as senhas.");
+		header("Location: /admin/funcionarios/$id_usuario/password");
+		exit;
+	}
+
+	$funcionarios = new Funcionarios();
+	$funcionarios->get((int)$id_usuario);
+	$funcionarios->setPassword($_POST['senha']);
+
+	Funcionarios::setSuccess("Senha alterada com sucesso. O funcionario ja pode usar a nova senha.");
+
+	header("Location: /admin/funcionarios/$id_usuario/password");
+	exit;
+});
+
+$app->get("/admin/funcionarios", function () {
+
+	Funcionarios::checkPermission('FUNCIONARIOS_VIEW');
+
+	$funcionarios = Funcionarios::listAll();
+
+	$page = new PageAdmin();
+
+	$page->setTpl("funcionarios", array(
+		"funcionarios" => $funcionarios
+	));
+});
+
+$app->get("/admin/index", function () {
+
+	Funcionarios::verifyLogin();
+
+	$index = Funcionarios::listAll();
+
+	$page = new PageAdmin();
+
+	$page->setTpl("index", array(
+		"index" => $index
+	));
+});
+
+$app->get("/admin/funcionarios/create", function () {
+
+	Funcionarios::checkPermission('FUNCIONARIOS_CREATE');
+
+	$page = new PageAdmin();
+	$page->setTpl("funcionarios-create");
+});
+
+$app->post('/admin/funcionarios/:id_usuario/delete', function ($id_usuario) {
+
+	Funcionarios::checkPermission('FUNCIONARIOS_DELETE');
+
+	$funcionario = new Funcionarios();
+	$funcionario->get((int)$id_usuario);
+	$funcionario->delete();
+
+	Funcionarios::setSuccess("Funcionário excluído com sucesso.");
+
+	header("Location: /admin/funcionarios");
+	exit;
+});
+
+$app->get('/acesso-negado', function () {
+
+	Funcionarios::verifyLogin();
+
+	$page = new PageAdmin();
+
+	$func = Funcionarios::getFromSession();
+	Funcionarios::registerAccess($func, 'ACESSO_NEGADO');
+
+	$page->setTpl("acesso-negado");
+});
+
+$app->get("/admin/funcionarios/:id_usuario", function ($id_usuario) {
+
+	Funcionarios::checkPermission('FUNCIONARIOS_UPDATE');
+
+	$funcionarios = new Funcionarios();
+	$funcionarios->get((int)$id_usuario);
+
+	$page = new PageAdmin();
+
+	$page->setTpl("funcionarios-update", array(
+		"funcionarios" => $funcionarios->getValues()
+	));
+});
+
+$app->post("/admin/funcionarios/create", function () {
+
+	Funcionarios::checkPermission('FUNCIONARIOS_CREATE');
+
+	$_POST = normalizarPostUtf8($_POST);
+
+	$_POST["inadmin"] = (isset($_POST["inadmin"])) ? 1 : 0;
+	$_POST["cpf"] = preg_replace('/\D+/', '', $_POST["cpf"]);
+	$_POST["nrphone"] = preg_replace('/\D+/', '', $_POST["nrphone"]);
+
+	if (!Funcionarios::validaCPF($_POST["cpf"])) {
+		echo "<script>alert('CPF inválido!'); window.history.back();</script>";
+		exit;
+	}
+
+	if (!Funcionarios::validaTelefone($_POST["nrphone"])) {
+		echo "<script>alert('Telefone inválido!'); window.history.back();</script>";
+		exit;
+	}
+
+	if (Funcionarios::checkCpfExists($_POST["cpf"])) {
+		echo "<script>alert('CPF já cadastrado!'); window.history.back();</script>";
+		exit;
+	}
+
+	if (Funcionarios::checkEmailExists($_POST["email"])) {
+		echo "<script>alert('E-mail já cadastrado!'); window.history.back();</script>";
+		exit;
+	}
+
+	if (Funcionarios::checkPhoneExists($_POST["nrphone"])) {
+		echo "<script>alert('Telefone já cadastrado!'); window.history.back();</script>";
+		exit;
+	}
+
+	$funcionarios = new Funcionarios();
+	$funcionarios->setData($_POST);
+	$funcionarios->save();
+	Funcionarios::setSuccess("Funcionario cadastrado com sucesso.");
+
+	header("Location: /admin/funcionarios");
+	exit;
+});
+
+$app->post("/admin/funcionarios/:id_usuario", function ($id_usuario) {
+
+	Funcionarios::checkPermission('FUNCIONARIOS_UPDATE');
+
+	$_POST = normalizarPostUtf8($_POST);
+
+	$_POST["cpf"] = preg_replace('/\D+/', '', $_POST["cpf"]);
+	$_POST["nrphone"] = preg_replace('/\D+/', '', $_POST["nrphone"]);
+
+	if (!Funcionarios::validaCPF($_POST["cpf"])) {
+		Funcionarios::setError("CPF invalido. Confira os numeros e tente novamente.");
+		header("Location: /admin/funcionarios/$id_usuario");
+		exit;
+	}
+
+	if (!Funcionarios::validaTelefone($_POST["nrphone"])) {
+		Funcionarios::setError("Telefone invalido. Informe DDD e numero corretos.");
+		header("Location: /admin/funcionarios/$id_usuario");
+		exit;
+	}
+
+	$funcionarios = new Funcionarios();
+	$funcionarios->get((int)$id_usuario);
+	$funcionarios->setData($_POST);
+	$funcionarios->update((int)$id_usuario, $_POST);
+	Funcionarios::setSuccess("Dados do funcionario atualizados com sucesso.");
+
+	header("Location: /admin/funcionarios");
+	exit;
+});
+
+$app->post('/admin/funcionarios/verificar-cpf', function () {
+
+	header('Content-Type: application/json; charset=utf-8');
+
+	$cpf = isset($_POST['cpf']) ? $_POST['cpf'] : '';
+	$id_usuario = isset($_POST['id_usuario']) ? (int)$_POST['id_usuario'] : 0;
+
+	$cpfLimpo = preg_replace('/\D+/', '', $cpf);
+
+	if ($cpfLimpo === '' || strlen($cpfLimpo) !== 11) {
+		echo json_encode([
+			'existe' => false
+		], JSON_UNESCAPED_UNICODE);
+		exit;
+	}
+
+	$sql = new Sql();
+
+	$results = $sql->select("
+        SELECT id_usuario
+        FROM funcionarios
+        WHERE REPLACE(REPLACE(REPLACE(cpf, '.', ''), '-', ''), '/', '') = :cpf
+        AND id_usuario <> :id_usuario
+        LIMIT 1
+    ", [
+		':cpf' => $cpfLimpo,
+		':id_usuario' => $id_usuario
+	]);
+
+	echo json_encode([
+		'existe' => count($results) > 0
+	], JSON_UNESCAPED_UNICODE);
+
+	exit;
+});

@@ -1,0 +1,14 @@
+2026-05-18 13:43:14|INFO: backupAutomatico() chamado | contexto=fechamento_dia | force=1 | cooldown=86400
+2026-05-18 13:43:14|INFO: backup gerado | contexto=fechamento_dia | arquivo=prato_cheio_2026-05-18.sql
+2026-05-18 13:43:14|WARN: backup enviado, mas nao registrado no banco remoto | contexto=fechamento_dia | msg=Banco remoto ativado, mas sem configuracao completa. Preencha RELATORIO_REMOTE_DB_HOST, RELATORIO_REMOTE_DB_NAME, RELATORIO_REMOTE_DB_USER e RELATORIO_REMOTE_DB_PASSWORD no .env, ou defina RELATORIO_REMOTE_DB_ENABLED=false.
+2026-05-18 13:43:14|INFO: upload realizado com sucesso | contexto=fechamento_dia | arquivo=prato_cheio_2026-05-18.sql
+2026-05-18 14:19:48|INFO: backupAutomatico() chamado | contexto=login | force=0 | cooldown=86400
+2026-05-18 14:19:48|INFO: backup não executado por cooldown/lock | contexto=login
+2026-05-18 14:20:03|INFO: backupAutomatico() chamado | contexto=fechamento_dia | force=1 | cooldown=86400
+2026-05-18 14:20:03|INFO: backup gerado | contexto=fechamento_dia | arquivo=prato_cheio_2026-05-18.sql
+2026-05-18 14:20:06|INFO: backup registrado no banco remoto | contexto=fechamento_dia | arquivo=prato_cheio_2026-05-18.sql | id=1
+2026-05-18 14:20:06|INFO: upload realizado com sucesso | contexto=fechamento_dia | arquivo=prato_cheio_2026-05-18.sql
+2026-05-18 16:54:52|INFO: backupAutomatico() chamado | contexto=login | force=0 | cooldown=86400
+2026-05-18 16:54:52|INFO: backup não executado por cooldown/lock | contexto=login
+2026-05-18 16:55:04|INFO: backupAutomatico() chamado | contexto=fechamento_dia | force=1 | cooldown=86400
+2026-05-18 16:55:04|ERRO: falha no backup | contexto=fechamento_dia | msg=Classe Hcode\Backup\BackupService não encontrada. Verifique o namespace/autoload do diretório vendor/API/php-classes/src/Backup.

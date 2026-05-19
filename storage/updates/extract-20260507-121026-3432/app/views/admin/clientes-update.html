@@ -1,0 +1,578 @@
+<style>
+    .campo-obrigatorio::after {
+        content: " *";
+        color: #dc3545;
+        font-weight: 700;
+    }
+</style>
+
+<div class="card card-info card-outline mb-4">
+    <div class="card-header">
+        <h3 class="card-title text-info">
+            <i class="bi bi-pencil-square"></i> Atualizar Cliente
+        </h3>
+    </div>
+
+    <div class="card-body pb-0">
+        {if="$msgSuccess != ''"}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {$msgSuccess}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {/if}
+
+        {if="$msgError != ''"}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {$msgError}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {/if}
+    </div>
+
+    <form class="needs-validation" id="form-cliente-update" action="/admin/clientes/update" method="post" novalidate>
+
+        <input type="hidden" name="ids_b64" value="{$ids_b64}">
+
+        <div class="card-body">
+
+            <div class="row g-3">
+
+                <!-- FAMÍLIA -->
+                <div class="col-12">
+                    <h5 class="text-info border-bottom pb-2">
+                        <i class="bi bi-people"></i> Família
+                    </h5>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Nome da Família</label>
+                    <input type="text" class="form-control form-control-sm" name="nome_familia"
+                        value="{$clientes.familia.0.nome_familia}">
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label campo-obrigatorio">Nome Completo</label>
+                    <input type="text" class="form-control form-control-sm" id="nome_completo" name="nome_completo"
+                        value="{$clientes.nome_completo}" required>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Nome Social</label>
+                    <input type="text" class="form-control form-control-sm" id="nome_social" name="nome_social"
+                        value="{$clientes.nome_social}">
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label campo-obrigatorio">Cor / Etnia</label>
+                    <input type="text" class="form-control form-control-sm" id="cor_cliente" name="cor_cliente"
+                        value="{$clientes.cor_cliente}" required>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Nome da Mãe</label>
+                    <input type="text" class="form-control form-control-sm" id="nome_mae" name="nome_mae"
+                        value="{$clientes.nome_mae}">
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label campo-obrigatorio">Sexo</label>
+                    <select class="form-select form-select-sm" id="genero_cliente" name="genero_cliente" required>
+                        <option value="">Selecione</option>
+                        <option value="M" {if="$clientes.genero_cliente=='M'" }selected{/if}>Masculino</option>
+                        <option value="F" {if="$clientes.genero_cliente=='F'" }selected{/if}>Feminino</option>
+                        <option value="Outro" {if="$clientes.genero_cliente=='Outro'" }selected{/if}>Outro</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label campo-obrigatorio">Estado Civil</label>
+                    <select class="form-select form-select-sm" id="estado_civil" name="estado_civil" required>
+                        <option value="">Selecione</option>
+                        <option value="Solteiro(a)" {if="$clientes.estado_civil=='Solteiro(a)'" }selected{/if}>
+                            Solteiro(a)</option>
+                        <option value="Casado(a)" {if="$clientes.estado_civil=='Casado(a)'" }selected{/if}>Casado(a)
+                        </option>
+                        <option value="Divorciado(a)" {if="$clientes.estado_civil=='Divorciado(a)'" }selected{/if}>
+                            Divorciado(a)</option>
+                        <option value="Viúvo(a)" {if="$clientes.estado_civil=='Viúvo(a)'" }selected{/if}>Viúvo(a)
+                        </option>
+                        <option value="União Estável" {if="$clientes.estado_civil=='União Estável'" }selected{/if}>União
+                            Estável</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label campo-obrigatorio">Nascimento</label>
+                    <input type="date" class="form-control form-control-sm" id="data_nascimento" name="data_nascimento"
+                        value="{$clientes.data_nascimento}" required>
+                </div>
+
+                <div class="col-md-1">
+                    <label class="form-label">Idade</label>
+                    <input type="number" class="form-control form-control-sm" id="idade_cliente"
+                        value="{$clientes.idade}" readonly>
+                    <small class="text-danger d-none" id="erro-idade"></small>
+                </div>
+
+                <div class="col-12 mt-4">
+                    <h5 class="text-info border-bottom pb-2">
+                        <i class="bi bi-card-text"></i> Documentos
+                    </h5>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">RG</label>
+                    <input type="text" class="form-control form-control-sm" id="rg" name="rg" value="{$clientes.rg}">
+                    <small class="text-danger d-none" id="erro-rg"></small>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label campo-obrigatorio">CPF</label>
+                    <input type="text" class="form-control form-control-sm" id="cpf" name="cpf" value="{$clientes.cpf}" required>
+                    <small class="text-danger d-none" id="erro-cpf"></small>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">NIS</label>
+                    <input type="text" class="form-control form-control-sm" id="nis" name="nis" value="{$clientes.nis}">
+                    <small class="text-danger d-none" id="erro-nis"></small>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">Status</label>
+                    <input type="text" class="form-control form-control-sm" id="status_cliente" name="status_cliente"
+                        value="Ativo" readonly>
+                </div>
+
+                <div class="col-12 mt-4">
+                    <h5 class="text-info border-bottom pb-2">
+                        <i class="bi bi-people"></i> Família
+                    </h5>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Nome da Família</label>
+                    <input type="text" class="form-control form-control-sm" id="nome_familia" name="nome_familia"
+                        value="{$clientes.familia.0.nome_familia}">
+                </div>
+
+                <div class="col-12 mt-4">
+                    <h5 class="text-info border-bottom pb-2">
+                        <i class="bi bi-telephone"></i> Contato
+                    </h5>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Telefone</label>
+                    <input type="text" class="form-control form-control-sm" id="telefone" name="telefone"
+                        value="{$clientes.telefone}">
+                    <small class="text-danger d-none" id="erro-telefone"></small>
+                </div>
+
+                <div class="col-12 mt-4">
+                    <h5 class="text-info border-bottom pb-2">
+                        <i class="bi bi-geo-alt"></i> Endereço
+                    </h5>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label campo-obrigatorio">CEP</label>
+                    <input type="text" class="form-control form-control-sm" id="cep" name="cep" value="{$clientes.cep}" required>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Rua</label>
+                    <input type="text" class="form-control form-control-sm" id="rua" name="rua" value="{$clientes.rua}">
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">Nº</label>
+                    <input type="text" class="form-control form-control-sm" id="numero" name="numero"
+                        value="{$clientes.numero}">
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Bairro</label>
+                    <input type="text" class="form-control form-control-sm" id="bairro" name="bairro"
+                        value="{$clientes.bairro}">
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Cidade</label>
+                    <input type="text" class="form-control form-control-sm" id="cidade" name="cidade"
+                        value="{$clientes.cidade}">
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Referência</label>
+                    <input type="text" class="form-control form-control-sm" id="referencia" name="referencia"
+                        value="{$clientes.referencia}">
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">Tempo de Moradia</label>
+                    <input type="text" class="form-control form-control-sm" id="tempo_moradia_cliente"
+                        name="tempo_moradia_cliente" value="{$clientes.tempo_moradia_anos}">
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">Nacionalidade</label>
+                    <input type="text" class="form-control form-control-sm" id="nacionalidade" name="nacionalidade"
+                        value="{$clientes.nacionalidade}">
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">Naturalidade</label>
+                    <input type="text" class="form-control form-control-sm" id="naturalidade" name="naturalidade"
+                        value="{$clientes.naturalidade}">
+                </div>
+
+            </div>
+        </div>
+
+        <div class="card-footer text-end">
+            <a href="/admin/clientes" class="btn btn-secondary btn-sm">Cancelar</a>
+            <button class="btn btn-info btn-sm" type="submit">
+                <i class="bi bi-save"></i> Atualizar
+            </button>
+        </div>
+    </form>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.8/jquery.inputmask.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    $(document).ready(function () {
+
+        if ($.fn.inputmask) {
+            $("#rg").inputmask({
+                mask: ["99.999.999-9", "999.999.999-99"],
+                greedy: false,
+                placeholder: ""
+            });
+
+            $("#cpf").inputmask("999.999.999-99");
+
+            $("#telefone").inputmask({
+                mask: ["(99) 9999-9999", "(99) 99999-9999"],
+                greedy: false,
+                placeholder: ""
+            });
+
+            $("#cep").inputmask("99999-999");
+        }
+
+        $("#data_nascimento").on("change", function () {
+            var dataNascimento = $(this).val();
+            var idade = calcularIdadeCliente(dataNascimento);
+
+            if (idade !== null) {
+                $("#idade_cliente").val(idade);
+            } else {
+                $("#idade_cliente").val('');
+            }
+
+            atualizarAvisoIdade(idade);
+        });
+
+        function validarCPF(cpf) {
+            cpf = cpf.replace(/[^\d]+/g, '');
+
+            if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) {
+                return false;
+            }
+
+            let soma = 0;
+            let resto;
+
+            for (let i = 1; i <= 9; i++) {
+                soma += parseInt(cpf.substring(i - 1, i)) * (11 - i);
+            }
+
+            resto = (soma * 10) % 11;
+            if (resto === 10 || resto === 11) resto = 0;
+            if (resto !== parseInt(cpf.substring(9, 10))) return false;
+
+            soma = 0;
+            for (let i = 1; i <= 10; i++) {
+                soma += parseInt(cpf.substring(i - 1, i)) * (12 - i);
+            }
+
+            resto = (soma * 10) % 11;
+            if (resto === 10 || resto === 11) resto = 0;
+            if (resto !== parseInt(cpf.substring(10, 11))) return false;
+
+            return true;
+        }
+
+        function mostrarErroCampo(idErro, mensagem, inputSelector) {
+            $(idErro).removeClass('d-none').text(mensagem);
+            $(inputSelector).addClass('is-invalid').focus();
+        }
+
+        function limparErroCampo(idErro, inputSelector) {
+            $(idErro).addClass('d-none').text('');
+            $(inputSelector).removeClass('is-invalid');
+        }
+
+        const camposObrigatoriosCliente = [
+            { selector: "#nome_completo", nome: "Nome Completo" },
+            { selector: "#cor_cliente", nome: "Cor/Etnia" },
+            { selector: "#genero_cliente", nome: "Sexo" },
+            { selector: "#estado_civil", nome: "Estado Civil" },
+            { selector: "#data_nascimento", nome: "Nascimento" },
+            { selector: "#cpf", nome: "CPF", digits: true },
+            { selector: "#cep", nome: "CEP", digits: true }
+        ];
+
+        function somenteDigitos(valor) {
+            return String(valor || "").replace(/\D/g, "");
+        }
+
+        function calcularIdadeCliente(dataNascimento) {
+            if (!dataNascimento) return null;
+
+            const partes = dataNascimento.split("-");
+            if (partes.length !== 3) return null;
+
+            const nascimento = new Date(Number(partes[0]), Number(partes[1]) - 1, Number(partes[2]));
+            if (Number.isNaN(nascimento.getTime())) return null;
+
+            const hoje = new Date();
+            let idade = hoje.getFullYear() - nascimento.getFullYear();
+            const m = hoje.getMonth() - nascimento.getMonth();
+
+            if (m < 0 || (m === 0 && hoje.getDate() < nascimento.getDate())) {
+                idade--;
+            }
+
+            return idade;
+        }
+
+        function campoObrigatorioPreenchido(campo) {
+            const valor = $(campo.selector).val();
+
+            if (campo.digits) {
+                return somenteDigitos(valor).length > 0;
+            }
+
+            return String(valor || "").trim() !== "";
+        }
+
+        function atualizarAvisoIdade(idade) {
+            if (idade !== null && idade < 18) {
+                $("#erro-idade")
+                    .removeClass("d-none")
+                    .text("Cliente menor de idade. So podem ser cadastrados clientes com idade maior ou igual a 18 anos.");
+                $("#data_nascimento, #idade_cliente").addClass("is-invalid");
+                return;
+            }
+
+            $("#erro-idade").addClass("d-none").text("");
+            $("#idade_cliente").removeClass("is-invalid");
+            if ($("#data_nascimento").val()) {
+                $("#data_nascimento").removeClass("is-invalid");
+            }
+        }
+
+        function validarObrigatoriosCliente() {
+            const faltando = [];
+
+            camposObrigatoriosCliente.forEach(function (campo) {
+                const preenchido = campoObrigatorioPreenchido(campo);
+                $(campo.selector).toggleClass("is-invalid", !preenchido);
+
+                if (!preenchido) {
+                    faltando.push(campo);
+                }
+            });
+
+            if (faltando.length > 0) {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Campos obrigatorios",
+                    html: "Preencha os campos obrigatorios:<br><strong>" +
+                        faltando.map(function (campo) { return campo.nome; }).join(", ") +
+                        "</strong>"
+                });
+                $(faltando[0].selector).focus();
+                return false;
+            }
+
+            const idade = calcularIdadeCliente($("#data_nascimento").val());
+            atualizarAvisoIdade(idade);
+
+            if (idade === null || idade < 18) {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Cliente menor de idade",
+                    text: "Cliente menor de idade. So podem ser cadastrados clientes com idade maior ou igual a 18 anos."
+                });
+                $("#data_nascimento").focus();
+                return false;
+            }
+
+            return true;
+        }
+
+        camposObrigatoriosCliente.forEach(function (campo) {
+            $(campo.selector).on("input change", function () {
+                if (campoObrigatorioPreenchido(campo)) {
+                    $(campo.selector).removeClass("is-invalid");
+                }
+            });
+        });
+
+        atualizarAvisoIdade(calcularIdadeCliente($("#data_nascimento").val()));
+
+        async function verificarDuplicidade(campo, valor) {
+
+            const idsB64 = document.querySelector("input[name='ids_b64']").value;
+
+            const resposta = await fetch(
+                `/admin/clientes/verificar-${campo}?valor=` +
+                encodeURIComponent(valor) +
+                `&ids_b64=` +
+                encodeURIComponent(idsB64)
+            );
+
+            const texto = await resposta.text();
+
+            try {
+                const data = JSON.parse(texto);
+                return data.exists === true;
+            } catch (e) {
+                console.error("Erro na rota verificar-" + campo, texto);
+                return false;
+            }
+        }
+
+        $("#cpf").on("blur", async function () {
+            let cpf = $(this).val();
+
+            limparErroCampo("#erro-cpf", "#cpf");
+
+            if (!cpf || cpf.replace(/\D/g, '').length < 11) return;
+
+            if (!validarCPF(cpf)) {
+                mostrarErroCampo("#erro-cpf", "Digite um CPF válido.", "#cpf");
+                return;
+            }
+
+            if (await verificarDuplicidade("cpf", cpf)) {
+                mostrarErroCampo("#erro-cpf", "Este CPF já está cadastrado.", "#cpf");
+            }
+        });
+
+        $("#rg").on("blur", async function () {
+            let rg = $(this).val();
+
+            limparErroCampo("#erro-rg", "#rg");
+
+            if (!rg) return;
+
+            if (await verificarDuplicidade("rg", rg)) {
+                mostrarErroCampo("#erro-rg", "Este RG já está cadastrado.", "#rg");
+            }
+        });
+
+        $("#nis").on("blur", async function () {
+            let nis = $(this).val();
+
+            limparErroCampo("#erro-nis", "#nis");
+
+            if (!nis) return;
+
+            if (await verificarDuplicidade("nis", nis)) {
+                mostrarErroCampo("#erro-nis", "Este NIS já está cadastrado.", "#nis");
+            }
+        });
+
+        $("#telefone").on("blur", async function () {
+            let telefone = $(this).val();
+
+            limparErroCampo("#erro-telefone", "#telefone");
+
+            if (!telefone) return;
+
+            if (await verificarDuplicidade("telefone", telefone)) {
+                mostrarErroCampo("#erro-telefone", "Este telefone já está cadastrado.", "#telefone");
+            }
+        });
+
+        $("#form-cliente-update").on("submit", async function (e) {
+            e.preventDefault();
+
+            if (!validarObrigatoriosCliente()) {
+                return;
+            }
+
+            const cpfFormulario = $("#cpf").val();
+
+            if (cpfFormulario && cpfFormulario.replace(/\D/g, "").length > 0 && !validarCPF(cpfFormulario)) {
+                Swal.fire({
+                    icon: "warning",
+                    title: "CPF inválido",
+                    text: "Digite um CPF válido."
+                });
+                $("#cpf").focus();
+                return;
+            }
+
+            if (cpfFormulario && cpfFormulario.replace(/\D/g, "").length > 0 && await verificarDuplicidade("cpf", cpfFormulario)) {
+                Swal.fire({
+                    icon: "warning",
+                    title: "CPF duplicado",
+                    text: "Este CPF já está cadastrado."
+                });
+                $("#cpf").focus();
+                return;
+            }
+
+            if ($("#rg").val() && await verificarDuplicidade("rg", $("#rg").val())) {
+                Swal.fire({
+                    icon: "warning",
+                    title: "RG duplicado",
+                    text: "Este RG já está cadastrado."
+                });
+                $("#rg").focus();
+                return;
+            }
+
+            if ($("#nis").val() && await verificarDuplicidade("nis", $("#nis").val())) {
+                Swal.fire({
+                    icon: "warning",
+                    title: "NIS duplicado",
+                    text: "Este NIS já está cadastrado."
+                });
+                $("#nis").focus();
+                return;
+            }
+
+            if ($("#telefone").val() && await verificarDuplicidade("telefone", $("#telefone").val())) {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Telefone duplicado",
+                    text: "Este telefone já está cadastrado."
+                });
+                $("#telefone").focus();
+                return;
+            }
+
+            Swal.fire({
+                icon: "success",
+                title: "Tudo certo",
+                text: "Cliente atualizado com sucesso.",
+                timer: 1200,
+                showConfirmButton: false
+            });
+
+            setTimeout(() => {
+                e.target.submit();
+            }, 1200);
+        });
+    });
+
+</script>

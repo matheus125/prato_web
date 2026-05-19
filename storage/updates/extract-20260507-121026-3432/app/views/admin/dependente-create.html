@@ -1,0 +1,608 @@
+<div class="card card-info card-outline mb-4">
+    <div class="card-header">
+        <h3 class="card-title font-weight-bold mb-0">Dependentes</h3>
+    </div>
+
+    <form class="needs-validation" id="formDependentes" novalidate>
+        <input type="hidden" name="id_titular" id="id_titular" required>
+
+        <div class="card-body">
+            <div class="row g-3">
+
+                <div class="col-12">
+                    <div class="callout callout-info mb-3">
+                        <h5 class="mb-2">Titular</h5>
+                        <p class="mb-0 text-muted">
+                            Selecione o titular para vincular os dependentes.
+                        </p>
+                    </div>
+                </div>  
+
+                <div class="col-md-8">
+                    <label class="form-label font-weight-bold">Titular Selecionado</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">
+                                <i class="fas fa-user"></i>
+                            </span>
+                        </div>  
+                        <input type="text" class="form-control bg-white" id="nome_titular" readonly required
+                            placeholder="Nenhum titular selecionado">
+                    </div>
+                    <div class="invalid-feedback">Selecione um titular.</div>
+                </div>
+
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="button" class="btn btn-secondary btn-block" data-bs-toggle="modal"
+                        data-bs-target="#modalTitulares">
+                        <i class="fas fa-search mr-1"></i> Selecionar Titular
+                    </button>
+                </div>
+
+                <div class="col-12">
+                    <div id="alertTitularSelecionado" class="alert alert-success d-none mb-0" role="alert">
+                        <i class="fas fa-check-circle mr-1"></i>
+                        <span id="textoTitularSelecionado">Titular selecionado com sucesso.</span>
+                    </div>
+                </div>
+
+                <div class="col-12 mt-3">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap">
+                        <div>
+                            <h5 class="mb-1">Dependentes</h5>
+                            <small class="text-muted">Cadastre um ou mais dependentes do titular.</small>
+                        </div>
+
+                        <button type="button" class="btn btn-success" id="btnAddDependente">
+                            <i class="fas fa-plus mr-1"></i> Adicionar Dependente
+                        </button>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div id="dependentesContainer"></div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="card-footer d-flex gap-2">
+            <button class="btn btn-info" type="submit">
+                <i class="fas fa-save mr-1"></i> Salvar
+            </button>
+            <a href="/admin/clientes" class="btn btn-outline-secondary">
+                <i class="fas fa-times mr-1"></i> Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- MODAL TITULARES -->
+<div class="modal fade" id="modalTitulares" tabindex="-1" aria-labelledby="modalTitularesLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                <div>
+                    <h5 class="modal-title mb-0" id="modalTitularesLabel">Selecionar Titular</h5>
+                    <small class="text-muted">Pesquise por nome ou CPF</small>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <div class="col-md-8">
+                        <label for="pesquisaTitular" class="form-label font-weight-bold">Pesquisar</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-white">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                            </div>
+                            <input type="text" id="pesquisaTitular" class="form-control"
+                                placeholder="Digite o nome ou CPF do titular">
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="selectPageSize" class="form-label font-weight-bold">Itens por página</label>
+                        <select id="selectPageSize" class="form-control">
+                            <option value="5">5</option>
+                            <option value="10" selected>10</option>
+                            <option value="15">15</option>
+                            <option value="20">20</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered table-striped">
+                        <thead class="thead-light">
+                            <tr>
+                                <th style="width: 90px;">ID</th>
+                                <th>Nome</th>
+                                <th style="width: 190px;">CPF</th>
+                                <th style="width: 130px;" class="text-center">Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody id="listaTitulares"></tbody>
+                    </table>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center flex-wrap mt-3">
+                    <small class="text-muted" id="titularesInfoPaginacao">Exibindo 0 registros</small>
+                    <ul class="pagination pagination-sm mb-0" id="paginacaoTitulares"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    #dependentesContainer .card {
+        border-radius: .5rem;
+        overflow: hidden;
+    }
+
+    #dependentesContainer .card-header {
+        background: #ffffff;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .dependente-item {
+        border-left: 4px solid #17a2b8;
+    }
+
+    .pagination .page-link {
+        cursor: pointer;
+    }
+
+    .pagination .page-item.disabled .page-link {
+        cursor: not-allowed;
+    }
+</style>
+
+<!-- SCRIPTS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/inputmask/4.0.9/jquery.inputmask.bundle.min.js"></script>
+
+<script>
+    let dependenteIndex = 0;
+    let titularesCache = [];
+    let titularesFiltrados = [];
+    let paginaAtualTitulares = 1;
+    let itensPorPaginaTitulares = 10;
+
+    document.addEventListener('DOMContentLoaded', function () {
+        $("[data-mask]").inputmask();
+
+        const container = document.getElementById('dependentesContainer');
+        const btnAdd = document.getElementById('btnAddDependente');
+        const pesquisaTitular = document.getElementById('pesquisaTitular');
+        const selectPageSize = document.getElementById('selectPageSize');
+        const listaTitulares = document.getElementById('listaTitulares');
+
+        btnAdd.addEventListener('click', function () {
+            dependenteIndex++;
+            criarDependente(dependenteIndex);
+        });
+
+        container.addEventListener('click', function (e) {
+            const btnRemover = e.target.closest('.remover-dependente');
+            if (btnRemover) {
+                btnRemover.closest('.dependente-item').remove();
+            }
+        });
+
+        container.addEventListener('input', function (e) {
+            if (e.target.classList.contains('campo-nascimento')) {
+                const card = e.target.closest('.dependente-item');
+                const inputIdade = card.querySelector('.campo-idade');
+                inputIdade.value = calcularIdade(e.target.value);
+            }
+        });
+
+        listaTitulares.addEventListener('click', function (e) {
+            const btnSelecionar = e.target.closest('.btn-selecionar-titular');
+            if (!btnSelecionar) return;
+
+            const id = btnSelecionar.dataset.id || '';
+            const nome = btnSelecionar.dataset.nome || '';
+
+            document.getElementById('id_titular').value = id;
+            document.getElementById('nome_titular').value = nome;
+
+            mostrarMensagemTitular(nome);
+
+            $('#modalTitulares').modal('hide');
+        });
+
+        pesquisaTitular.addEventListener('input', function () {
+            paginaAtualTitulares = 1;
+            filtrarTitulares();
+        });
+
+        selectPageSize.addEventListener('change', function () {
+            itensPorPaginaTitulares = parseInt(this.value, 10) || 10;
+            paginaAtualTitulares = 1;
+            renderizarTitulares();
+        });
+
+        $('#modalTitulares').on('show.bs.modal', function () {
+            carregarTitulares();
+            setTimeout(function () {
+                pesquisaTitular.focus();
+            }, 300);
+        });
+
+        $('#modalTitulares').on('hidden.bs.modal', function () {
+            pesquisaTitular.value = '';
+            paginaAtualTitulares = 1;
+            titularesFiltrados = [...titularesCache];
+            renderizarTitulares();
+        });
+    });
+
+    function criarDependente(index) {
+        const html = `
+            <div class="card mb-4 dependente-item shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span class="font-weight-bold text-info">
+                        <i class="fas fa-user-friends mr-1"></i> Dependente ${index}
+                    </span>
+                    <button type="button" class="btn btn-outline-danger btn-sm remover-dependente">
+                        <i class="fas fa-trash-alt mr-1"></i> Remover
+                    </button>
+                </div>
+
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label font-weight-bold">Nome</label>
+                            <input type="text" class="form-control" name="dependentes[${index}][nome]" required>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label font-weight-bold">RG</label>
+                            <input type="text" class="form-control" name="dependentes[${index}][rg]">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label font-weight-bold">CPF</label>
+                            <input type="text" class="form-control" name="dependentes[${index}][cpf]"
+                                data-inputmask='"mask": "999.999.999-99"' data-mask>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label font-weight-bold">Nascimento</label>
+                            <input type="date" class="form-control campo-nascimento"
+                                name="dependentes[${index}][data_nascimento]">
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label font-weight-bold">Idade</label>
+                            <input type="number" class="form-control campo-idade bg-light"
+                                name="dependentes[${index}][idade]" readonly>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label font-weight-bold">Gênero</label>
+                            <select class="form-control" name="dependentes[${index}][genero]">
+                                <option value="">Selecione</option>
+                                <option value="M">Masculino</option>
+                                <option value="F">Feminino</option>
+                                <option value="Outro">Outro</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label font-weight-bold">Parentesco</label>
+                            <select class="form-control" name="dependentes[${index}][dependencia_cliente]">
+                                <option value="">Selecione</option>
+                                <option value="Filho(a)">Filho(a)</option>
+                                <option value="Cônjuge">Cônjuge</option>
+                                <option value="Pai/Mãe">Pai/Mãe</option>
+                                <option value="Outro">Outro</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.getElementById('dependentesContainer').insertAdjacentHTML('beforeend', html);
+        $("[data-mask]").inputmask();
+    }
+
+    function calcularIdade(dataNascimento) {
+        if (!dataNascimento) return '';
+
+        const hoje = new Date();
+        const nascimento = new Date(dataNascimento + 'T00:00:00');
+
+        let idade = hoje.getFullYear() - nascimento.getFullYear();
+        const mes = hoje.getMonth() - nascimento.getMonth();
+
+        if (mes < 0 || (mes === 0 && hoje.getDate() < nascimento.getDate())) {
+            idade--;
+        }
+
+        return idade >= 0 ? idade : '';
+    }
+
+    function normalizarTexto(texto) {
+        return (texto || '')
+            .toString()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .trim();
+    }
+
+    function apenasNumeros(texto) {
+        return (texto || '').toString().replace(/\D/g, '');
+    }
+
+    function escaparHtml(texto) {
+        return (texto || '')
+            .toString()
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function mostrarMensagemTitular(nome) {
+        const alerta = document.getElementById('alertTitularSelecionado');
+        const texto = document.getElementById('textoTitularSelecionado');
+
+        texto.textContent = 'Titular selecionado com sucesso: ' + nome;
+        alerta.classList.remove('d-none');
+
+        setTimeout(function () {
+            alerta.classList.add('d-none');
+        }, 4000);
+    }
+
+    function carregarTitulares() {
+        $.getJSON('/admin/titulares/json', function (data) {
+            titularesCache = Array.isArray(data) ? data : [];
+            titularesFiltrados = [...titularesCache];
+            renderizarTitulares();
+        }).fail(function () {
+            $('#listaTitulares').html(`
+                <tr>
+                    <td colspan="4" class="text-center text-danger py-4">
+                        Erro ao carregar titulares
+                    </td>
+                </tr>
+            `);
+            $('#paginacaoTitulares').html('');
+            $('#titularesInfoPaginacao').text('Nenhum registro disponível');
+        });
+    }
+
+    function filtrarTitulares() {
+        const termoOriginal = document.getElementById('pesquisaTitular').value || '';
+        const termoTexto = normalizarTexto(termoOriginal);
+        const termoNumero = apenasNumeros(termoOriginal);
+
+        titularesFiltrados = titularesCache.filter(function (t) {
+            const nome = normalizarTexto(t.nome_completo || '');
+            const cpfFormatado = t.cpf || '';
+            const cpfNumero = apenasNumeros(cpfFormatado);
+
+            const bateNome = nome.includes(termoTexto);
+            const bateCpfFormatado = normalizarTexto(cpfFormatado).includes(termoTexto);
+            const bateCpfSemMascara = termoNumero ? cpfNumero.includes(termoNumero) : false;
+
+            return bateNome || bateCpfFormatado || bateCpfSemMascara;
+        });
+
+        renderizarTitulares();
+    }
+
+    function renderizarTitulares() {
+        const tbody = document.getElementById('listaTitulares');
+        const info = document.getElementById('titularesInfoPaginacao');
+
+        if (!titularesFiltrados.length) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="4" class="text-center text-muted py-4">
+                        Nenhum titular encontrado
+                    </td>
+                </tr>
+            `;
+            document.getElementById('paginacaoTitulares').innerHTML = '';
+            info.textContent = 'Exibindo 0 registros';
+            return;
+        }
+
+        const totalItens = titularesFiltrados.length;
+        const totalPaginas = Math.ceil(totalItens / itensPorPaginaTitulares);
+        const paginaAtual = Math.min(paginaAtualTitulares, totalPaginas);
+        const inicio = (paginaAtual - 1) * itensPorPaginaTitulares;
+        const fim = inicio + itensPorPaginaTitulares;
+        const itensPagina = titularesFiltrados.slice(inicio, fim);
+
+        let html = '';
+
+        itensPagina.forEach(function (t) {
+            html += `
+                <tr>
+                    <td>${t.id ?? ''}</td>
+                    <td>${escaparHtml(t.nome_completo ?? '')}</td>
+                    <td>${escaparHtml(t.cpf ?? '')}</td>
+                    <td class="text-center">
+                        <button type="button"
+                            class="btn btn-success btn-sm btn-selecionar-titular"
+                            data-id="${t.id ?? ''}"
+                            data-nome="${escaparHtml(t.nome_completo ?? '')}">
+                            <i class="fas fa-check mr-1"></i> Selecionar
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+
+        tbody.innerHTML = html;
+        info.textContent = `Exibindo ${inicio + 1} a ${Math.min(fim, totalItens)} de ${totalItens} registros`;
+
+        renderizarPaginacao(totalPaginas, paginaAtual);
+        paginaAtualTitulares = paginaAtual;
+    }
+
+    function renderizarPaginacao(totalPaginas, paginaAtual) {
+        const paginacao = document.getElementById('paginacaoTitulares');
+
+        if (totalPaginas <= 1) {
+            paginacao.innerHTML = '';
+            return;
+        }
+
+        let html = '';
+
+        html += `
+            <li class="page-item ${paginaAtual === 1 ? 'disabled' : ''}">
+                <button class="page-link" type="button" data-page="${paginaAtual - 1}">&laquo;</button>
+            </li>
+        `;
+
+        const paginas = obterPaginasVisiveis(totalPaginas, paginaAtual);
+
+        paginas.forEach(function (pagina) {
+            if (pagina === '...') {
+                html += `
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                `;
+            } else {
+                html += `
+                    <li class="page-item ${pagina === paginaAtual ? 'active' : ''}">
+                        <button class="page-link" type="button" data-page="${pagina}">${pagina}</button>
+                    </li>
+                `;
+            }
+        });
+
+        html += `
+            <li class="page-item ${paginaAtual === totalPaginas ? 'disabled' : ''}">
+                <button class="page-link" type="button" data-page="${paginaAtual + 1}">&raquo;</button>
+            </li>
+        `;
+
+        paginacao.innerHTML = html;
+
+        paginacao.querySelectorAll('[data-page]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                const novaPagina = parseInt(this.dataset.page, 10);
+                if (!novaPagina || novaPagina < 1 || novaPagina > totalPaginas) return;
+
+                paginaAtualTitulares = novaPagina;
+                renderizarTitulares();
+            });
+        });
+    }
+
+    function obterPaginasVisiveis(totalPaginas, paginaAtual) {
+        const paginas = [];
+
+        if (totalPaginas <= 7) {
+            for (let i = 1; i <= totalPaginas; i++) {
+                paginas.push(i);
+            }
+            return paginas;
+        }
+
+        paginas.push(1);
+
+        if (paginaAtual > 4) {
+            paginas.push('...');
+        }
+
+        const inicioMiolo = Math.max(2, paginaAtual - 1);
+        const fimMiolo = Math.min(totalPaginas - 1, paginaAtual + 1);
+
+        for (let i = inicioMiolo; i <= fimMiolo; i++) {
+            paginas.push(i);
+        }
+
+        if (paginaAtual < totalPaginas - 3) {
+            paginas.push('...');
+        }
+
+        paginas.push(totalPaginas);
+
+        return paginas;
+    }
+</script>
+
+<script>
+    document.getElementById('formDependentes').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const idTitular = document.getElementById('id_titular').value;
+
+        if (!idTitular) {
+            alert('Selecione um titular');
+            return;
+        }
+
+        const dependentes = [];
+        let erroValidacao = false;
+
+        document.querySelectorAll('.dependente-item').forEach(function (dep) {
+            const nome = dep.querySelector('input[name$="[nome]"]')?.value.trim();
+
+            if (!nome) {
+                alert('Todos os dependentes devem ter nome');
+                erroValidacao = true;
+                return;
+            }
+
+            dependentes.push({
+                nome: nome,
+                rg: dep.querySelector('input[name$="[rg]"]')?.value ?? '',
+                cpf: dep.querySelector('input[name$="[cpf]"]')?.value ?? '',
+                data_nascimento: dep.querySelector('input[name$="[data_nascimento]"]')?.value ?? '',
+                idade: dep.querySelector('input[name$="[idade]"]')?.value ?? '',
+                genero: dep.querySelector('select[name$="[genero]"]')?.value ?? '',
+                dependencia_cliente: dep.querySelector('select[name$="[dependencia_cliente]"]')?.value ?? ''
+            });
+        });
+
+        if (erroValidacao) return;
+
+        fetch('/admin/dependentes/create-json', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                id_titular: idTitular,
+                dependentes: dependentes
+            })
+        })
+            .then(function (res) {
+                return res.json();
+            })
+            .then(function (json) {
+                if (!json.success) {
+                    alert(json.message || 'Erro ao salvar dependentes');
+                    return;
+                }
+
+                alert('Dependentes salvos com sucesso!');
+                window.location.href = '/admin/clientes';
+            })
+            .catch(function (err) {
+                console.error(err);
+                alert('Erro ao salvar dependentes');
+            });
+    });
+
+    
+</script>

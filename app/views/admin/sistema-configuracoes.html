@@ -1,0 +1,77 @@
+<div class="content-wrapper">
+  <section class="content-header painel-topo">
+    <h1>
+      <i class="bi bi-sliders"></i> Configuracoes do sistema
+      <small>Variaveis operacionais</small>
+    </h1>
+  </section>
+
+  <section class="content">
+    <div class="container-fluid">
+      {if="$success"}
+      <div class="alert alert-success shadow-sm">
+        <i class="bi bi-check-circle me-1"></i> {$success}
+      </div>
+      {/if}
+
+      {if="$error"}
+      <div class="alert alert-danger shadow-sm">
+        <i class="bi bi-exclamation-triangle me-1"></i> {$error}
+      </div>
+      {/if}
+
+      <div class="card painel-formulario">
+        <div class="card-header cabecalho-formulario">
+          <div class="card-title">
+            <i class="bi bi-gear"></i> Parametros editaveis
+          </div>
+        </div>
+
+        <form method="post" action="/admin/configuracoes/sistema" autocomplete="off">
+          <input type="hidden" name="csrf_token" value="{$csrf_token}">
+
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="limite_senhas_dia" class="form-label fw-semibold">Total diario de senhas/refeicoes</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="100000"
+                  step="1"
+                  class="form-control"
+                  id="limite_senhas_dia"
+                  name="limite_senhas_dia"
+                  value="{$settings.limite_senhas_dia}"
+                  required>
+                <div class="form-text">Usado no fechamento automatico e nos controles de venda diaria.</div>
+              </div>
+
+              <div class="col-md-6">
+                <label for="programa_nome" class="form-label fw-semibold">Nome do programa no ticket</label>
+                <input
+                  type="text"
+                  maxlength="80"
+                  class="form-control"
+                  id="programa_nome"
+                  name="programa_nome"
+                  value="{$settings.programa_nome}"
+                  required>
+                <div class="form-text">Substitui o texto fixo "PRATO CHEIO ALEIXO" impresso nas senhas.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-footer d-flex justify-content-end gap-2">
+            <a href="/admin" class="btn btn-outline-secondary">
+              <i class="bi bi-arrow-left"></i> Voltar
+            </a>
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-save"></i> Salvar configuracoes
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+</div>

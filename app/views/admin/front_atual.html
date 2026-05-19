@@ -1,0 +1,1232 @@
+<img id="iconeAviao" src="../res/img/aviao.png" style="display:none;" />
+
+
+<div class="card mb-4">
+  <div class="card-header d-flex justify-content-center">
+    <h3 class="card-title mb-0">EMPRESA</h3>
+  </div>
+  <!-- /.card-header -->
+  <!--begin::App Content-->
+  <div class="app-content">
+    <!--begin::Container-->
+    <div class="container-fluid">
+      <!--begin::Row-->
+      <div class="row">
+        <div class="card mb-4">
+          <div class="card-header">
+            <h3 class="card-title">Informações para contato</h3>
+          </div>
+          <!-- /.card-header -->
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Empresa</th>
+                  <th>OS / Status</th>
+                  <th>Consultor</th>
+                  <th>Telefone</th>
+                  <th>E-mail</th>
+                  <th>local</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loop="$lista_contato_empresa"}
+                <tr>
+                  <td>{$value.informacoes_gerais}</td>
+                  <td>{$value.informacoes_os}</td>
+                  <td>{$value.consultor}</td>
+                  <td>{$value.telefone}</td>
+                  <td>{$value.email}</td>
+                  <td>{$value.local_servico}</td>
+                  <td>
+                    <a href="" class="btn btn-primary btn-xs mb-3" data-bs-toggle="modal"
+                      data-bs-target="#modalRelatorio">
+                      <i class="fa fa-edit"></i> Visualizar
+                    </a>
+                  </td>
+                </tr>
+                {/loop}
+              </tbody>
+            </table>
+          </div>
+          <!-- /.card-body -->
+          <div class="card-footer clearfix">
+            <ul class="pagination pagination-sm m-0 float-end">
+              <li class="page-item"><a class="page-link" href="#">&laquo;</a></li>
+              <li class="page-item"><a class="page-link" href="#">1</a></li>
+              <li class="page-item"><a class="page-link" href="#">2</a></li>
+              <li class="page-item"><a class="page-link" href="#">3</a></li>
+              <li class="page-item"><a class="page-link" href="#">&raquo;</a></li>
+            </ul>
+          </div>
+        </div> <!-- fim do card mb-4 -->
+
+      </div> <!-- fim da row -->
+
+    </div> <!--end::Container-->
+  </div> <!--end::App Content-->
+
+  <!-- /.card-body -->
+  <div class="card-footer clearfix">
+    <a href="/admin/empresa/create" class="btn btn-sm btn-primary float-start">
+      NOVO CADASTRO
+    </a>
+  </div>
+</div> <!-- fim do card principal -->
+
+<!-- Modal de Relatório Diário -->
+<div class="modal fade" id="modalRelatorio" tabindex="-1" aria-labelledby="modalRelatorioLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalRelatorioLabel">COMPROVANTE DE EMISSÃO</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+
+      <div class="modal-body pdf-a4" id="conteudoPDF">
+        <form class="row g-3">
+          <div class="col-12">
+            <label for="empresa" class="form-label">Empresa</label>
+            <textarea class="form-control" id="empresa" rows="4" readonly></textarea>
+          </div>
+
+          <div class="col-md-6">
+            <label for="os" class="form-label">OS / Status</label>
+            <input type="text" class="form-control" id="os" readonly>
+          </div>
+
+          <div class="col-md-6">
+            <label for="consultor" class="form-label">Consultor</label>
+            <input type="text" class="form-control" id="consultor" readonly>
+          </div>
+
+          <div class="col-md-6">
+            <label for="telefone" class="form-label">Telefone</label>
+            <input type="text" class="form-control" id="telefone" readonly>
+          </div>
+
+          <div class="col-md-6">
+            <label for="email" class="form-label">E-mail</label>
+            <input type="email" class="form-control" id="email" readonly>
+          </div>
+
+          <div class="col-12">
+            <label for="mao" class="form-label">MAO</label>
+            <input type="text" class="form-control" id="mao" readonly>
+          </div>
+
+          <div class="col-12">
+            <label for="passageiros" class="form-label">Passageiros Selecionados</label>
+            <textarea class="form-control" id="passageiros" rows="3" readonly></textarea>
+          </div>
+        </form>
+
+        <div class="mt-4 d-flex gap-2">
+          <button type="button" class="btn btn-success" onclick="exportarPDF()">Exportar PDF</button>
+
+          <!-- Novo botão -->
+          <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#modalExtra">
+            Adicionar Passageiros
+          </button>
+
+          <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modalDestinos">
+            Adicionar Destinos
+          </button>
+
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+      </div>
+    </div> <!-- fim modal-content -->
+  </div> <!-- fim modal-dialog -->
+</div> <!-- fim modal -->
+
+<!-- Modal Selecionar Passageiros -->
+<div class="modal fade" id="modalExtra" tabindex="-1" aria-labelledby="modalExtraLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Selecionar Passageiros</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <div class="modal-body row">
+        <!-- Tabela de passageiros disponíveis -->
+        <div class="col-md-6">
+          <h6>Passageiros Disponíveis</h6>
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Ação</th>
+              </tr>
+            </thead>
+            <tbody id="tabelaPassageiros">
+              {loop="$lista_passageiros"}
+              <tr>
+                <td>{$value.nome_passageiros}</td>
+                <td>
+                  <button class="btn btn-sm btn-success"
+                    onclick="selecionarPassageiro('{$value.nome_passageiros}', this)">Selecionar</button>
+                </td>
+              </tr>
+              {/loop}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Lista de passageiros selecionados -->
+        <div class="col-md-6">
+          <h6>Selecionados</h6>
+          <ul id="listaSelecionados" class="list-group"></ul>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="voltarParaModalRelatorio()">Voltar</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- FIM MODAL PASSAGEIROS -->
+
+
+<!-- MODAL DESTINOS ATUALIZADO -->
+<!-- ========================= -->
+
+<!-- CSS: afrouxa o layout e aumenta o modal no desktop -->
+<style>
+  /* Full width confortável no desktop */
+  @media (min-width: 1200px) {
+
+    /* xl */
+    #modalDestinos .modal-dialog {
+      max-width: 1200px;
+    }
+  }
+
+  @media (min-width: 1400px) {
+
+    /* xxl */
+    #modalDestinos .modal-dialog {
+      max-width: 1400px;
+    }
+  }
+
+  /* Melhora legibilidade das tabelas */
+  #modalDestinos .table th,
+  #modalDestinos .table td {
+    vertical-align: middle;
+  }
+
+  #modalDestinos .table .truncate {
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Garante que as colunas do grid não “estourem” */
+  #modalDestinos .modal-body .row>[class*="col-"] {
+    min-width: 0;
+  }
+</style>
+
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
+  <div id="toastDuplicado" class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive"
+    aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body">
+        ⚠️ Este destino já foi selecionado!
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+        aria-label="Close"></button>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modalDestinos" tabindex="-1" aria-labelledby="modalDestinosLabel" aria-hidden="true">
+  <!-- Fullscreen até LG; mais largo em telas grandes -->
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable modal-fullscreen-lg-down">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">Selecionar Destinos</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Lado a lado só a partir de XL; abaixo disso, empilha -->
+        <div class="row g-3">
+
+          <!-- DISPONÍVEIS -->
+          <div class="col-12 col-xl-6">
+            <h6 class="fw-bold">Destinos Disponíveis</h6>
+
+            <!-- Tabela só em telas XL+ (≥1200px) -->
+            <div class="table-responsive d-none d-xl-block">
+              <table class="table table-striped table-sm align-middle">
+                <thead class="table-light">
+                  <tr>
+                    <th>ID</th>
+                    <th>Status</th>
+                    <th>Data Emissão</th>
+                    <th>Origem</th>
+                    <th>Destino</th>
+                    <th class="d-none d-xl-table-cell">Duração</th>
+                    <!-- Menor prioridade: só em XXL (≥1400px) -->
+                    <th class="d-none d-xxl-table-cell">Escalas</th>
+                    <th class="d-none d-xxl-table-cell">Bagagem</th>
+                    <th class="d-none d-xxl-table-cell">Família</th>
+                    <th class="d-none d-xxl-table-cell">Classe</th>
+                    <th class="d-none d-xxl-table-cell">Tarifa</th>
+                    <th class="d-none d-xxl-table-cell">Taxa</th>
+                    <th class="d-none d-xxl-table-cell">tx_embarque</th>
+                    <th class="d-none d-xxl-table-cell">Assentos</th>
+                    <th>Ação</th>
+                  </tr>
+                </thead>
+                <tbody id="tabelaDestinos">
+                  {loop="$lista_destinos"}
+                  <tr>
+                    <td class="truncate">{$value.id}</td>
+                    <td class="truncate">{$value.status}</td>
+                    <td class="truncate">{$value.data_emissao}</td>
+                    <td class="truncate">{$value.origem}</td>
+                    <td class="truncate">{$value.destino}</td>
+                    <td class="truncate d-none d-xl-table-cell">{$value.duracao}</td>
+                    <td class="truncate d-none d-xxl-table-cell">{$value.escalas}</td>
+                    <td class="truncate d-none d-xxl-table-cell">{$value.bagagem}</td>
+                    <td class="truncate d-none d-xxl-table-cell">{$value.familia}</td>
+                    <td class="truncate d-none d-xxl-table-cell">{$value.classe}</td>
+                    <td class="truncate d-none d-xxl-table-cell">{$value.tarifa}</td>
+                    <td class="truncate d-none d-xxl-table-cell">{$value.taxa}</td>
+                    <td class="truncate d-none d-xxl-table-cell">{$value.tx_embarque}</td>
+                    <td class="truncate d-none d-xxl-table-cell">{$value.assento}</td>
+                    <td>
+                      <button class="btn btn-sm btn-success" onclick="selecionarDestino(this)">Selecionar</button>
+                    </td>
+                  </tr>
+                  {/loop}
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Cards até LG/MD/… e também em LG (até <XL) -->
+            <div class="d-block d-xl-none" id="cardsDestinos">
+              {loop="$lista_destinos"}
+              <div class="card mb-2 shadow-sm">
+                <div class="card-body p-2">
+                  <p class="mb-1"><strong>ID:</strong> {$value.id}</p>
+                  <p class="mb-1"><strong>Status:</strong> {$value.status}</p>
+                  <p class="mb-1"><strong>Origem:</strong> {$value.origem} → <strong>Destino:</strong> {$value.destino}
+                  </p>
+                  <p class="mb-1"><strong>Data:</strong> {$value.data_emissao} | <strong>Duração:</strong>
+                    {$value.duracao}</p>
+                  <p class="mb-1"><strong>Classe:</strong> {$value.classe} | <strong>Bagagem:</strong> {$value.bagagem}
+                  </p>
+                  <p class="mb-1 d-none"><strong>Família:</strong> {$value.familia}</p>
+                  <p class="mb-1 d-none"><strong>Escalas:</strong> {$value.escalas}</p>
+                  <p class="mb-1 d-none"><strong>Tarifa:</strong> {$value.tarifa} | <strong>Taxa:</strong> {$value.taxa}
+                  </p>
+                  <p class="mb-1 d-none"><strong>Tx embarque:</strong> {$value.tx_embarque}</p>
+                  <p class="mb-1 d-none"><strong>Tx embarque:</strong> {$value.assento}</p>
+                  <button class="btn btn-sm btn-success mt-2 w-100"
+                    onclick="selecionarDestino(this)">Selecionar</button>
+                </div>
+              </div>
+              {/loop}
+            </div>
+          </div>
+
+          <!-- Destinos selecionados -->
+          <div class="col-12 col-lg-6">
+            <h6 class="fw-bold">Destinos Selecionados</h6>
+
+            <!-- Tabela em telas grandes -->
+            <div class="table-responsive d-none d-md-block">
+              <table class="table table-striped table-sm align-middle">
+                <thead class="table-light">
+                  <tr>
+                    <th>ID</th>
+                    <th>Status</th>
+                    <th>Data Emissão</th>
+                    <th>Origem</th>
+                    <th>Destino</th>
+                    <th>Duração</th>
+                    <th>Escalas</th>
+                    <th>Bagagem</th>
+                    <th>Família</th>
+                    <th>Classe</th>
+                    <th>Tarifa</th>
+                    <th>Taxa</th>
+                    <th>tx_embarque</th>
+                    <th>Assentos</th>
+                    <th>Ação</th>
+                  </tr>
+                </thead>
+                <tbody id="tabelaSelecionados">
+                  <!-- Recebe os selecionados -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Cards em telas pequenas -->
+            <div class="d-block d-md-none" id="cardsSelecionados">
+              <!-- Vai receber os selecionados -->
+            </div>
+          </div>
+
+
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="voltarParaModalRelatorioDestinos()">Voltar</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- FIM MODAL DESTINOS -->
+
+
+
+<!-- Scripts para gerar o relatorio -->
+<script>
+  /* =============================
+     BLOCO 1 - EVENTOS DE TABELA (preenche modalRelatorio)
+  ============================== */
+  document.addEventListener('DOMContentLoaded', function () {
+    const visualizarBotoes = document.querySelectorAll('a[data-bs-target="#modalRelatorio"]');
+
+    visualizarBotoes.forEach(function (botao) {
+      botao.addEventListener('click', function (e) {
+        e.preventDefault();
+
+        const linha = this.closest('tr');
+        const colunas = linha.querySelectorAll('td');
+
+        document.getElementById('empresa').value = colunas[0].textContent.trim();
+
+        const osStatus = colunas[1].textContent.trim().split(' - ');
+        document.getElementById('os').value = osStatus[0] || '';
+        if (document.getElementById('status')) {
+          document.getElementById('status').value = osStatus[1] || '';
+        }
+
+        document.getElementById('consultor').value = colunas[2].textContent.trim();
+        document.getElementById('telefone').value = colunas[3].textContent.trim();
+        document.getElementById('email').value = colunas[4].textContent.trim();
+        document.getElementById('mao').value = colunas[5].textContent.trim();
+      });
+    });
+  });
+
+  /* =============================
+     ESTADO GLOBAL
+  ============================== */
+  const passageirosSelecionados = [];
+  let associacoes = []; // [{ passageiro, voo, assento, valor, idDestino }]
+
+  /* =============================
+     HELPERS
+  ============================== */
+  function getDestinosSelecionados() {
+    const linhas = Array.from(document.querySelectorAll('#tabelaSelecionados tr'));
+    return linhas.map(tr => {
+      const tds = tr.querySelectorAll('td');
+      return {
+        id: tds[0]?.innerText.trim() || '',            // normalmente VOO/ID
+        status: tds[1]?.innerText.trim() || '',
+        dataEmissao: tds[2]?.innerText.trim() || '',
+        origem: tds[3]?.innerText.trim() || '',
+        destino: tds[4]?.innerText.trim() || '',
+        duracao: tds[5]?.innerText.trim() || '',
+        escalas: tds[6]?.innerText.trim() || '',
+        bagagem: tds[7]?.innerText.trim() || '',
+        familia: tds[8]?.innerText.trim() || '',
+        classe: tds[9]?.innerText.trim() || '',
+        tarifa: tds[10]?.innerText.trim() || '',
+        taxa: tds[11]?.innerText.trim() || '',
+        txEmbarque: tds[12]?.innerText.trim() || ''
+      };
+    });
+  }
+
+  function removerAssociacoesDoDestino(idDestino) {
+    if (!idDestino) return;
+    associacoes = associacoes.filter(a => a.idDestino !== idDestino);
+  }
+
+  function formatarData(dataStr) {
+    if (!dataStr) return '';
+    const data = new Date(dataStr);
+    if (isNaN(data.getTime())) return dataStr;
+    const dia = String(data.getDate()).padStart(2, '0');
+    const mes = String(data.getMonth() + 1).padStart(2, '0');
+    const ano = data.getFullYear();
+    const hora = String(data.getHours()).padStart(2, '0');
+    const min = String(data.getMinutes()).padStart(2, '0');
+    return `${dia}/${mes}/${ano} ${hora}:${min}`;
+  }
+
+  // ==============================
+  // QUEBRA AUTOMÁTICA DE PÁGINA
+  // ==============================
+  function ensureSpace(doc, y, needed, onNewPage) {
+    const limite = 280; // área útil
+    if (y + needed > limite) {
+      doc.addPage();
+      y = 20; // topo da nova página
+      if (typeof onNewPage === 'function') onNewPage(y);
+    }
+    return y;
+  }
+
+  /* =============================
+    BLOCO 2 - EXPORTAR PDF (com papel timbrado e conteúdo completo)
+ ============================== */
+  /* =============================
+    BLOCO 2 - EXPORTAR PDF (com fallback de timbrado)
+ ============================= */
+
+  async function exportarPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+
+    // Função auxiliar para carregar imagem
+    async function loadImage(url) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = "anonymous"; // evita erro CORS
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = url;
+      });
+    }
+
+    // === 0) INSERE PAPEL TIMBRADO COMO FUNDO EM TODAS AS PÁGINAS ===
+    let timbrado;
+    try {
+      timbrado = await loadImage("../res/img/PAPEL_TIMBRADO_ORIGINAL.png");
+      doc.addImage(timbrado, "PNG", 0, 0, pageWidth, pageHeight);
+
+      // Reaplica o timbrado sempre que criar nova página
+      doc.internal.events.subscribe("addPage", () => {
+        doc.addImage(timbrado, "PNG", 0, 0, pageWidth, pageHeight);
+      });
+    } catch (e) {
+      console.error("Erro ao carregar papel timbrado:", e);
+    }
+
+    // 1) CAPTURA CAMPOS PRINCIPAIS
+    const empresa = document.getElementById('empresa')?.value || '';
+    const os = document.getElementById('os')?.value || '';
+    const statusRel = document.getElementById('status')?.value || '';
+    const consultor = document.getElementById('consultor')?.value || '';
+    const telefone = document.getElementById('telefone')?.value || '';
+    const email = document.getElementById('email')?.value || '';
+    const mao = document.getElementById('mao')?.value || '';
+    const passageiros = document.getElementById('passageiros')?.value || '';
+    const centroCusto = document.getElementById('centroCusto')?.value || '';
+
+    // 2) CAPTURA TABELA DE DESTINOS
+    const linhasTabela = Array.from(document.querySelectorAll('#tabelaSelecionados tr')).map(tr => {
+      const tds = Array.from(tr.querySelectorAll('td'));
+      return tds.slice(0, -1).map(td => td.innerText.trim()); // ignora última coluna (ação)
+    });
+
+    let statusSelecionado = linhasTabela[0]?.[1] || '';
+    let dataEmissaoSelecionada = linhasTabela[0]?.[2] || '';
+
+    let y = 45;
+
+    // 3) CABEÇALHO
+    doc.setFontSize(14);
+    doc.setTextColor(255, 0, 0);
+
+    // Header "Informações para contato"
+    doc.setFontSize(12);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(28, 21, 122);     // Azul extraído da imagem
+    doc.setDrawColor(28, 21, 122);     // Mesmo azul para a borda
+    doc.setLineWidth(0.6);
+    y = ensureSpace(doc, y, 10);
+    doc.rect(10, y, 190, 10);
+    doc.text(' Informações para contato', 12, y + 7);
+
+    y += 15;
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(0, 0, 0);
+
+    const contatoLinhas = [
+      `Empresa: ${empresa}`,
+      `OS: ${os}  ${statusRel}`,
+      `Consultor: ${consultor}`,
+      `Telefone: ${telefone}`,
+      `E-mail: ${email}`,
+      `${mao}`
+    ];
+    contatoLinhas.forEach(txt => {
+      y = ensureSpace(doc, y, 6);
+      doc.text(txt, 12, y);
+      y += 6;
+    });
+
+    // 4) PASSAGEIROS E CENTRO DE CUSTO
+    y += 4;
+    doc.setDrawColor(0, 0, 153);
+    doc.setTextColor(0, 0, 153);
+    doc.setFontSize(12);
+    doc.setFont(undefined, 'bold');
+    doc.setLineWidth(0.6);
+    y = ensureSpace(doc, y, 10);
+    doc.rect(10, y, 190, 10);
+    doc.line(105, y, 105, y + 10);
+    doc.text('Passageiros', 12, y + 7);
+    doc.text('Centro de custo', 107, y + 7);
+
+    y += 15;
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(0, 0, 0);
+
+    const linhasPassageiros = (passageiros || '')
+      .split('\n')
+      .map(p => p.trim().toUpperCase())
+      .filter(Boolean);
+
+    linhasPassageiros.forEach(linha => {
+      y = ensureSpace(doc, y, 6);
+      doc.text(linha, 12, y);
+      y += 6;
+    });
+
+    if (centroCusto) {
+      const alturaUsada = Math.max(1, linhasPassageiros.length) * 6;
+      const yCentro = y - alturaUsada;
+      doc.text(centroCusto, 107, Math.max(40, yCentro));
+    }
+
+    y += 10;
+
+    // 5) LOCALIZADOR + STATUS + DATA
+    doc.setDrawColor(0, 0, 153);
+    doc.setTextColor(0, 0, 153);
+    doc.setFontSize(12);
+    doc.setFont(undefined, 'bold');
+    doc.setLineWidth(0.6);
+    y = ensureSpace(doc, y, 10);
+    doc.rect(10, y, 190, 10);
+    doc.text('Localizador KENLIC', 12, y + 7);
+
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(0, 0, 0);
+    y = ensureSpace(doc, y, 18);
+    doc.text('Status:', 12, y + 15);
+
+    doc.setFont(undefined, 'normal');
+    if ((statusSelecionado || '').toLowerCase() === 'emitida') {
+      doc.setTextColor(255, 0, 0);
+    } else {
+      doc.setTextColor(0, 0, 0);
+    }
+    doc.text(statusSelecionado, 30, y + 15);
+
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(0, 0, 0);
+    doc.text('Data emissão:', 120, y + 15);
+
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(0, 0, 0);
+    doc.text(formatarData(dataEmissaoSelecionada), 160, y + 15);
+
+    y += 28;
+
+    // 6) TABELA DE VOOS
+    const drawHeaderVoos = () => {
+      doc.setFillColor(230, 230, 230);   // fundo cinza claro
+      doc.rect(10, y - 5, 190, 8, 'F'); // barra de fundo
+      doc.setFont(undefined, 'bold');    // negrito
+      doc.setTextColor(0, 0, 0);         // preto
+      const cabecalhos = ["VOO", "ORIGEM", "DESTINO", "DURAÇÃO", "ESCALAS", "BAGAGEM", "FAMÍLIA", "CLASSE"];
+      const colX = [12, 25, 65, 105, 130, 150, 170, 190];
+      cabecalhos.forEach((titulo, index) => doc.text(titulo, colX[index], y));
+      doc.setFont(undefined, 'normal');  // volta para normal
+      y += 6;
+      return colX;
+    };
+
+    let colX = drawHeaderVoos();
+
+    linhasTabela.forEach(cols => {
+      if (cols.length >= 11) {
+        const origemTexto = doc.splitTextToSize(cols[3] || '', 35);
+        const destinoTexto = doc.splitTextToSize(cols[4] || '', 35);
+        const familiaTexto = doc.splitTextToSize(cols[8] || '', 20);
+        const classeTexto = doc.splitTextToSize(cols[9] || '', 20);
+        const maxLinhas = Math.max(origemTexto.length, destinoTexto.length, familiaTexto.length, classeTexto.length, 1);
+
+        y = ensureSpace(doc, y, maxLinhas * 6, () => { colX = drawHeaderVoos(); });
+
+        doc.text(cols[0] || '', colX[0], y);
+        doc.text(origemTexto, colX[1], y);
+        doc.text(destinoTexto, colX[2], y);
+        doc.text(cols[5] || '', colX[3], y);
+        doc.text(cols[6] || '', colX[4], y);
+        doc.text(cols[7] || '', colX[5], y);
+        doc.text(familiaTexto, colX[6], y);
+        doc.text(classeTexto, colX[7], y);
+
+        y += maxLinhas * 6;
+      }
+    });
+
+    // 7) TARIFA POR TRECHO
+    y += 10;
+
+    doc.setFontSize(12);
+    doc.setFont(undefined, 'bold');
+    doc.setLineWidth(0.6);
+    y = ensureSpace(doc, y, 10);
+    doc.text('Tarifa por trecho', 12, y + 7);
+
+    y += 15;
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(0, 0, 0);
+
+    const drawHeaderTarifa = () => {
+      doc.setFillColor(230, 230, 230);   // fundo cinza claro
+      doc.rect(10, y - 5, 190, 8, 'F'); // barra de fundo
+      doc.setFont(undefined, 'bold');    // negrito
+      doc.setTextColor(0, 0, 0);         // preto
+      const cabecalhosTarifa = ["ORIGEM", "DESTINO", "TARIFA", "TX.EMBARQUE"];
+      const colXTarifa = [12, 85, 150, 175];
+      cabecalhosTarifa.forEach((titulo, i) => doc.text(titulo, colXTarifa[i], y));
+      doc.setFont(undefined, 'normal');
+      doc.setTextColor(0, 0, 0);
+      y += 6;
+      return colXTarifa;
+    };
+
+    let colXTarifa = drawHeaderTarifa();
+
+    linhasTabela.forEach(cols => {
+      const origem = cols[3] || '';
+      const destino = cols[4] || '';
+      const tarifa = cols[10] || '';
+      const txEmbarque = cols[12] || '';
+
+      y = ensureSpace(doc, y, 6, () => { colXTarifa = drawHeaderTarifa(); });
+
+      doc.text(origem, colXTarifa[0], y);
+      doc.text(destino, colXTarifa[1], y);
+      doc.text(tarifa, colXTarifa[2], y);
+      doc.text(txEmbarque, colXTarifa[3], y);
+
+      y += 6;
+    });
+
+    // 8) ASSENTOS
+    y += 15;
+
+    doc.setFontSize(12);
+    doc.setFont(undefined, 'bold');
+    doc.setLineWidth(0.6);
+    y = ensureSpace(doc, y, 10);
+    doc.text('Assentos', 12, y + 7);
+
+    y += 15;
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(0, 0, 0);
+
+    const drawHeaderPVAV = () => {
+      doc.setFillColor(230, 230, 230);   // fundo cinza claro
+      doc.rect(10, y - 5, 190, 8, 'F'); // barra de fundo
+      doc.setFont(undefined, 'bold');    // negrito
+      doc.setTextColor(0, 0, 0);         // preto
+      const cabecalhosPVAV = ["PASSAGEIROS", "VOO", "ASSENTOS", "VALOR"];
+      const colXPVAV = [12, 90, 130, 170];
+      cabecalhosPVAV.forEach((titulo, i) => doc.text(titulo, colXPVAV[i], y));
+      doc.setFont(undefined, 'normal');
+      doc.setTextColor(0, 0, 0);
+      y += 6;
+      return colXPVAV;
+    };
+
+
+
+    let colXPVAV = drawHeaderPVAV();
+
+    if (associacoes.length === 0) {
+      y = ensureSpace(doc, y, 6);
+      doc.text('(Sem associações registradas. Selecione passageiros e associe a um destino.)', 12, y);
+      y += 6;
+    } else {
+      associacoes.forEach(item => {
+        y = ensureSpace(doc, y, 6, () => { colXPVAV = drawHeaderPVAV(); });
+        doc.text(String(item.passageiro || ''), colXPVAV[0], y);
+        doc.text(String(item.voo || ''), colXPVAV[1], y);
+        doc.text(String(item.assento || ''), colXPVAV[2], y);
+        doc.text(String(item.valor || ''), colXPVAV[3], y);
+        y += 6;
+      });
+    }
+
+    y += 5;
+
+    // 9) TICKETS
+    y += 15;
+
+    doc.setFontSize(12);
+    doc.setFont(undefined, 'bold');
+    doc.setLineWidth(0.6);
+    y = ensureSpace(doc, y, 10);
+    doc.text('Tickets', 12, y + 7);
+
+    y += 15;
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(0, 0, 0);
+
+    const drawHeaderTickets = () => {
+      doc.setFillColor(230, 230, 230);   // fundo cinza claro
+      doc.rect(10, y - 5, 190, 8, 'F'); // barra de fundo
+      doc.setFont(undefined, 'bold');    // negrito
+      doc.setTextColor(0, 0, 0);         // preto
+      const cabecalhos = ["PASSAGEIRO", "TICKET"];
+      const colX = [12, 120];
+      cabecalhos.forEach((titulo, i) => doc.text(titulo, colX[i], y));
+      doc.setFont(undefined, 'normal');
+      y += 6;
+      return colX;
+    };
+
+    let colXTickets = drawHeaderTickets();
+
+    if (associacoes.length === 0) {
+      y = ensureSpace(doc, y, 6);
+      doc.text('(Sem tickets registrados.)', 12, y);
+      y += 6;
+    } else {
+      associacoes.forEach(item => {
+        y = ensureSpace(doc, y, 6, () => { colXTickets = drawHeaderTickets(); });
+        doc.text(String(item.passageiro || ''), colXTickets[0], y);
+        doc.text(String(item.ticket || ''), colXTickets[1], y);
+        y += 6;
+      });
+    }
+
+    // 10) RODAPÉ - PAGAMENTO
+
+    // Helper: converte string BR (ex: "R$ 1.234,56" ou "1.234,56") em Number
+    function parseBRNumber(value) {
+      if (value === null || value === undefined) return 0;
+      let s = String(value).trim();
+      if (!s) return 0;
+      // remove caracteres não numéricos
+      s = s.replace(/[^\d\-,.]/g, '').replace(/\s/g, '');
+      const hasComma = s.indexOf(',') !== -1;
+      const hasDot = s.indexOf('.') !== -1;
+      if (hasComma && hasDot) {
+        s = s.replace(/\./g, '').replace(',', '.'); // vírgula = decimal
+      } else if (hasComma && !hasDot) {
+        s = s.replace(',', '.'); // só vírgula -> decimal
+      }
+      const n = parseFloat(s);
+      return Number.isNaN(n) ? 0 : n;
+    }
+
+    // Detectar passageiros selecionados
+    let passageirosSelecionados = [];
+    try {
+      if (typeof window.getPassageirosSelecionados === 'function') {
+        passageirosSelecionados = getPassageirosSelecionados() || [];
+      } else if (Array.isArray(window.passageirosSelecionados)) {
+        passageirosSelecionados = window.passageirosSelecionados;
+      } else if (Array.isArray(associacoes) && associacoes.length) {
+        passageirosSelecionados = associacoes
+          .map(a => (a.passageiro || '').toString().trim())
+          .filter(Boolean);
+      } else if (typeof linhasPassageiros !== 'undefined' && Array.isArray(linhasPassageiros)) {
+        passageirosSelecionados = linhasPassageiros.slice();
+      }
+    } catch (e) {
+      passageirosSelecionados = [];
+    }
+    // limpar e deduplicar
+    passageirosSelecionados = [...new Set(
+      passageirosSelecionados.map(p => p && p.toString().trim()).filter(Boolean)
+    )];
+
+    // Função de cálculo
+    // Função de cálculo
+    function calcularTotais(linhas, numPassageirosOverride) {
+      let tarifaTotal = 0;
+      let taxaTotal = 0;
+      let txEmbarqueTotal = 0;
+
+      linhas.forEach(cols => {
+        const tarifa = parseBRNumber(cols[10]) || 0;      // ajuste se índice mudar
+        const txEmbarque = parseBRNumber(cols[12]) || 0;  // ajuste se índice mudar
+        const taxa = tarifa * 0.10;
+
+        tarifaTotal += tarifa;
+        taxaTotal += taxa;
+        txEmbarqueTotal += txEmbarque;
+      });
+
+      let numPassageiros = 1;
+      if (numPassageirosOverride > 0) {
+        numPassageiros = numPassageirosOverride;
+      } else if (passageirosSelecionados.length > 0) {
+        numPassageiros = passageirosSelecionados.length;
+      } else if (linhas.length > 0) {
+        numPassageiros = linhas.length;
+      }
+
+      // Total de UM passageiro
+      const totalIndividual = tarifaTotal + taxaTotal + txEmbarqueTotal;
+
+      // Total de TODOS os passageiros
+      const totalPorTipo = totalIndividual * numPassageiros;
+
+      return {
+        tarifa: tarifaTotal,
+        taxa: taxaTotal,
+        txEmbarque: txEmbarqueTotal,
+        totalIndividual,
+        totalPorTipo,
+        totalGeral: totalPorTipo,
+        numPassageiros
+      };
+    }
+
+
+    // Chamada principal
+    const totaisCalculados = calcularTotais(linhasTabela, passageirosSelecionados.length);
+
+    const formatarMoeda = (valor) =>
+      valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+    // ==== Renderização do bloco ====
+    doc.setFontSize(12);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(28, 21, 122);
+    doc.setDrawColor(28, 21, 122);
+    doc.setLineWidth(0.6);
+    y = ensureSpace(doc, y, 10);
+    doc.rect(10, y, 190, 10);
+    doc.text(' Pagamento', 12, y + 7);
+
+    y += 15;
+
+    // Cabeçalho
+    const cabecalho = ['#', 'TARIFA', 'TAXA', 'TX.EMBARQUE', 'TOTAL INDIVIDUAL', 'TOTAL POR TIPO'];
+    const dados = [[
+      `${totaisCalculados.numPassageiros} Passageiro${totaisCalculados.numPassageiros > 1 ? 's' : ''}`,
+      formatarMoeda(totaisCalculados.tarifa),
+      formatarMoeda(totaisCalculados.taxa),
+      formatarMoeda(totaisCalculados.txEmbarque),
+      formatarMoeda(totaisCalculados.totalIndividual), // 1 pessoa
+      formatarMoeda(totaisCalculados.totalPorTipo)     // todos
+    ]];
+
+
+    const colWidths = [35, 30, 25, 35, 40, 40];
+    let x = 10;
+    let rowHeight = 8;
+
+    // Cabeçalho com fundo cinza
+    doc.setFontSize(9);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(0, 0, 0);
+    doc.setFillColor(240, 240, 240);
+    doc.rect(10, y, 190, rowHeight, 'F');
+
+    x = 10;
+    cabecalho.forEach((col, i) => {
+      doc.text(col, x + 2, y + 6);
+      x += colWidths[i];
+    });
+
+    y += rowHeight;
+
+    // Linha de dados
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(0, 0, 0);
+    doc.setFillColor(255, 255, 255);
+    doc.rect(10, y, 190, rowHeight, 'F');
+
+    x = 10;
+    dados[0].forEach((col, i) => {
+      doc.text(col, x + 2, y + 6);
+      x += colWidths[i];
+    });
+
+    y += rowHeight + 5;
+
+    // Totais
+    doc.setFont(undefined, 'bold');
+    doc.text('Total', 150, y);
+    doc.text(formatarMoeda(totaisCalculados.totalGeral), 195, y, { align: 'right' });
+
+    y += 8;
+    doc.text('Assento', 150, y);
+    doc.text(formatarMoeda(0), 195, y, { align: 'right' }); // ainda fixo
+    // FIM
+
+
+
+
+
+    // 11) RODAPÉ
+    doc.setFontSize(8);
+    doc.setTextColor(150);
+    doc.text('emitido por Confiança agência de viagens', 210, 280, { angle: 90 });
+
+    doc.save('comprovante.pdf');
+  }
+
+
+  // Função auxiliar para carregar imagem
+  function loadImage(url) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.src = url;
+      img.onload = () => resolve(img);
+    });
+  }
+
+  // =============================
+  // BLOCO 3 - PASSAGEIROS (com associação via prompt de destino, assento e ticket)
+  // =============================
+  function selecionarPassageiro(nome, botao) {
+    if (passageirosSelecionados.includes(nome)) {
+      alert('Passageiro já foi selecionado.');
+      return;
+    }
+
+    const destinos = getDestinosSelecionados();
+    if (destinos.length === 0) {
+      alert('Selecione pelo menos um destino antes de escolher passageiros!');
+      return;
+    }
+
+    passageirosSelecionados.push(nome);
+
+    const lista = document.getElementById('listaSelecionados');
+    const item = document.createElement('li');
+    item.className = 'list-group-item d-flex justify-content-between align-items-center';
+    item.innerHTML = `${nome}
+    <button class="btn btn-sm btn-danger" onclick="removerSelecionado('${nome}', this)">Remover</button>`;
+    lista.appendChild(item);
+
+    if (botao) botao.disabled = true;
+
+    // escolher destino para o passageiro
+    let escolhido = null;
+    if (destinos.length === 1) {
+      escolhido = destinos[0];
+    } else {
+      const menu = destinos.map((d, i) => `${i + 1}) ${d.origem} → ${d.destino} | Voo: ${d.id} | Tarifa: ${d.tarifa}`).join('\n');
+      const resp = prompt(`Escolha o destino para ${nome} (1-${destinos.length}):\n${menu}`, '1');
+      const idx = parseInt(resp, 10) - 1;
+      if (isNaN(idx) || idx < 0 || idx >= destinos.length) {
+        alert('Escolha inválida. Associação não criada.');
+      } else {
+        escolhido = destinos[idx];
+      }
+    }
+
+    if (escolhido) {
+      const assento = prompt(`Assento para ${nome} no voo ${escolhido.id} (opcional):`, '') || '';
+      const ticket = prompt(`Ticket para ${nome} no voo ${escolhido.id} (obrigatório):`, '') || '';
+
+      associacoes.push({
+        passageiro: nome,
+        voo: escolhido.id,
+        assento,
+        ticket, // novo campo
+        valor: escolhido.tarifa || '',
+        idDestino: escolhido.id
+      });
+    }
+
+    atualizarCampoPassageiros();
+  }
+
+
+
+
+
+  function removerSelecionado(nome, botaoRemover) {
+    const index = passageirosSelecionados.indexOf(nome);
+    if (index > -1) passageirosSelecionados.splice(index, 1);
+
+    // remove associações ligadas a esse passageiro
+    associacoes = associacoes.filter(a => a.passageiro !== nome);
+
+    if (botaoRemover) botaoRemover.closest('li').remove();
+
+    const botoes = document.querySelectorAll('#tabelaPassageiros button');
+    botoes.forEach(btn => {
+      if (btn.innerText === 'Selecionar' && btn.closest('tr').querySelector('td').innerText === nome) {
+        btn.disabled = false;
+      }
+    });
+
+    atualizarCampoPassageiros();
+  }
+
+  function atualizarCampoPassageiros() {
+    const campo = document.getElementById('passageiros');
+    if (campo) campo.value = passageirosSelecionados.join('\n');
+  }
+
+  /* =============================
+     BLOCO 4 - DESTINOS (selecionar/remover + cards) - sem duplicidade
+  ============================== */
+  function mostrarToastDuplicado() {
+    const toastEl = document.getElementById('toastDuplicado');
+    if (!toastEl) {
+      alert('Este destino já está selecionado.');
+      return;
+    }
+    const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
+    toast.show();
+  }
+
+  function selecionarDestino(botao) {
+    const linha = botao.closest('tr');
+    const dados = Array.from(linha.querySelectorAll('td')).map(td => td.innerText);
+    const idDestino = (dados[0] || '').trim();
+
+    // --- Verifica duplicado na TABELA ---
+    const tbodySelecionados = document.getElementById('tabelaSelecionados');
+    const idsTabela = Array.from(tbodySelecionados.querySelectorAll('tr td:first-child')).map(td => td.innerText.trim());
+    if (idsTabela.includes(idDestino)) {
+      mostrarToastDuplicado();
+      return;
+    }
+
+    // --- Verifica duplicado nos CARDS ---
+    const cardsSelecionados = document.getElementById('cardsSelecionados');
+    const idsCards = Array.from(cardsSelecionados.querySelectorAll('.card-body p:first-child')).map(p => p.innerText.replace('ID:', '').trim());
+    if (idsCards.includes(idDestino)) {
+      mostrarToastDuplicado();
+      return;
+    }
+
+    // --- Adiciona na TABELA (desktop) ---
+    const novaLinha = document.createElement('tr');
+    for (let i = 0; i < dados.length - 1; i++) { // -1 ignora coluna de ação da tabela original
+      const td = document.createElement('td');
+      td.innerText = dados[i];
+      novaLinha.appendChild(td);
+    }
+
+    const tdAcao = document.createElement('td');
+    tdAcao.innerHTML = `<button class="btn btn-sm btn-danger" onclick="removerDestino(this)">Remover</button>`;
+    novaLinha.appendChild(tdAcao);
+
+    tbodySelecionados.appendChild(novaLinha);
+
+    // --- Adiciona no CARD (mobile) ---
+    const card = document.createElement('div');
+    card.className = 'card shadow-sm mb-2';
+    card.innerHTML = `
+      <div class="card-body p-2">
+        <p class="mb-1"><strong>ID:</strong> ${dados[0]}</p>
+        <p class="mb-1"><strong>Status:</strong> ${dados[1]}</p>
+        <p class="mb-1"><strong>Data Emissão:</strong> ${dados[2]}</p>
+        <p class="mb-1"><strong>Origem:</strong> ${dados[3]}</p>
+        <p class="mb-1"><strong>Destino:</strong> ${dados[4]}</p>
+        <p class="mb-1"><strong>Duração:</strong> ${dados[5]}</p>
+        <p class="mb-1"><strong>Escalas:</strong> ${dados[6]}</p>
+        <p class="mb-1"><strong>Bagagem:</strong> ${dados[7]}</p>
+        <p class="mb-1"><strong>Família:</strong> ${dados[8]}</p>
+        <p class="mb-1"><strong>Classe:</strong> ${dados[9]}</p>
+        <p class="mb-1"><strong>Tarifa:</strong> ${dados[10]}</p>
+        <p class="mb-1"><strong>Taxa:</strong> ${dados[11]}</p>
+        <p class="mb-1"><strong>Tx. Embarque:</strong> ${dados[12]}</p>
+        <button class="btn btn-sm btn-danger mt-2" onclick="removerCard('${idDestino}')">Remover</button>
+      </div>`;
+    cardsSelecionados.appendChild(card);
+  }
+
+  function removerDestino(btn) {
+    const linha = btn.closest('tr');
+    const idDestino = linha.querySelector('td')?.innerText.trim();
+    removerAssociacoesDoDestino(idDestino);
+    linha.remove();
+
+    // também remove o card com o mesmo id
+    const cards = document.querySelectorAll('#cardsSelecionados .card');
+    cards.forEach(card => {
+      const id = card.querySelector('p:first-child').innerText.replace('ID:', '').trim();
+      if (id === idDestino) card.remove();
+    });
+  }
+
+  function removerCard(idDestino) {
+    // remove card
+    const cards = document.querySelectorAll('#cardsSelecionados .card');
+    cards.forEach(card => {
+      const id = card.querySelector('p:first-child').innerText.replace('ID:', '').trim();
+      if (id === idDestino) card.remove();
+    });
+
+    // remove linha da tabela correspondente
+    const tbodySelecionados = document.getElementById('tabelaSelecionados');
+    const linhas = tbodySelecionados.querySelectorAll('tr');
+    linhas.forEach(linha => {
+      if (linha.querySelector('td') && linha.querySelector('td').innerText.trim() === idDestino) {
+        linha.remove();
+      }
+    });
+
+    // remove associações deste destino
+    removerAssociacoesDoDestino(idDestino);
+  }
+
+  /* =============================
+     BLOCO 5 - NAVEGAÇÃO ENTRE MODAIS
+  ============================== */
+  function voltarParaModalRelatorio() {
+    const modalExtra = bootstrap.Modal.getInstance(document.getElementById('modalExtra'));
+    if (modalExtra) modalExtra.hide();
+    new bootstrap.Modal(document.getElementById('modalRelatorio')).show();
+  }
+
+  function voltarParaModalRelatorioDestinos() {
+    const modalDestinos = bootstrap.Modal.getInstance(document.getElementById('modalDestinos'));
+    if (modalDestinos) modalDestinos.hide();
+    new bootstrap.Modal(document.getElementById('modalRelatorio')).show();
+  }
+
+  function abrirDestinos() {
+    const modalRelatorio = bootstrap.Modal.getInstance(document.getElementById('modalRelatorio'));
+    if (modalRelatorio) modalRelatorio.hide();
+    new bootstrap.Modal(document.getElementById('modalDestinos')).show();
+  }
+</script>
+
+
+
+
+
+<!-- Bibliotecas necessárias -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>

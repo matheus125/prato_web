@@ -1,0 +1,148 @@
+<style>
+  .campo-obrigatorio::after {
+    content: " *";
+    color: #dc3545;
+    font-weight: 700;
+  }
+</style>
+
+<div class="card card-info card-outline mb-4">
+  <div class="card-header">
+    <h3 class="card-title text-info">
+      <i class="bi bi-person-plus"></i> Cadastro de Cliente em Vulnerabilidade
+    </h3>
+  </div>
+
+  <div class="card-body pb-0">
+    {if="$msgSuccess != ''"}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      {$msgSuccess}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {/if}
+
+    {if="$msgError != ''"}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      {$msgError}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {/if}
+  </div>
+
+  <form class="needs-validation" id="form-vulnerabilidade-create" action="/admin/clientes/vulnerabilidade/create" method="post" novalidate>
+    <input type="hidden" name="status_cliente" value="{$statusCliente}">
+
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-5">
+          <label class="form-label campo-obrigatorio">Nome/Apelido</label>
+          <input type="text" class="form-control form-control-sm" id="nome_completo" name="nome_completo" required>
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label campo-obrigatorio">Sexo</label>
+          <select class="form-select form-select-sm" id="genero_cliente" name="genero_cliente" required>
+            <option value="">Selecione</option>
+            <option value="M">Masculino</option>
+            <option value="F">Feminino</option>
+            <option value="Outro">Outro</option>
+          </select>
+        </div>
+
+        <div class="col-md-2">
+          <label class="form-label campo-obrigatorio">Idade</label>
+          <input type="number" class="form-control form-control-sm" id="idade" name="idade" min="0" max="130" required>
+        </div>
+
+        <div class="col-md-2">
+          <label class="form-label">Status</label>
+          <input type="text" class="form-control form-control-sm" value="{$statusCliente}" readonly>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-footer text-end">
+      <a href="/admin/clientes" class="btn btn-secondary btn-sm">Cancelar</a>
+      <button class="btn btn-info btn-sm" type="submit" id="btnSalvarVulnerabilidade">
+        <i class="bi bi-save"></i> Salvar Cliente
+      </button>
+    </div>
+  </form>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+  $(document).ready(function () {
+    const camposObrigatorios = [
+      { selector: "#nome_completo", nome: "Nome/Apelido" },
+      { selector: "#genero_cliente", nome: "Sexo" },
+      { selector: "#idade", nome: "Idade" }
+    ];
+
+    function campoPreenchido(campo) {
+      return String($(campo.selector).val() || "").trim() !== "";
+    }
+
+    function validarFormulario() {
+      const faltando = [];
+
+      camposObrigatorios.forEach(function (campo) {
+        const preenchido = campoPreenchido(campo);
+        $(campo.selector).toggleClass("is-invalid", !preenchido);
+
+        if (!preenchido) {
+          faltando.push(campo);
+        }
+      });
+
+      const idade = Number($("#idade").val());
+      const idadeInvalida = !Number.isInteger(idade) || idade < 0 || idade > 130;
+
+      if ($("#idade").val() && idadeInvalida) {
+        $("#idade").addClass("is-invalid");
+        Swal.fire({
+          icon: "warning",
+          title: "Idade invalida",
+          text: "Informe uma idade valida."
+        });
+        $("#idade").focus();
+        return false;
+      }
+
+      if (faltando.length > 0) {
+        Swal.fire({
+          icon: "warning",
+          title: "Campos obrigatorios",
+          html: "Preencha os campos obrigatorios:<br><strong>" +
+            faltando.map(function (campo) { return campo.nome; }).join(", ") +
+            "</strong>"
+        });
+        $(faltando[0].selector).focus();
+        return false;
+      }
+
+      return true;
+    }
+
+    camposObrigatorios.forEach(function (campo) {
+      $(campo.selector).on("input change", function () {
+        if (campoPreenchido(campo)) {
+          $(campo.selector).removeClass("is-invalid");
+        }
+      });
+    });
+
+    $("#form-vulnerabilidade-create").on("submit", function (e) {
+      e.preventDefault();
+
+      if (!validarFormulario()) {
+        return;
+      }
+
+      $("#btnSalvarVulnerabilidade").prop("disabled", true).html('<i class="bi bi-hourglass-split"></i> Salvando...');
+      this.submit();
+    });
+  });
+</script>

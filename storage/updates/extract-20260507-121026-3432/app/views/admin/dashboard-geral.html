@@ -1,0 +1,441 @@
+<style>
+    :root {
+        --bg: #f4f7fb;
+        --surface: #ffffff;
+        --surface-2: #f8fafc;
+        --text: #1f2937;
+        --muted: #6b7280;
+        --line: #e5e7eb;
+        --primary: #1f3b57;
+        --primary-2: #284d73;
+        --success: #198754;
+        --danger: #dc3545;
+        --warning: #f59e0b;
+        --info: #0ea5e9;
+        --shadow: 0 12px 30px rgba(15, 23, 42, .08);
+        --radius: 18px;
+    }
+
+    .dg-page {
+        background: linear-gradient(180deg, #f8fbff 0%, var(--bg) 100%);
+        min-height: calc(100vh - 80px);
+        padding: 22px;
+        color: var(--text)
+    }
+
+    .dg-shell {
+        max-width: 1440px;
+        margin: 0 auto
+    }
+
+    .dg-hero {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-2) 100%);
+        color: #fff;
+        border-radius: 24px;
+        padding: 26px 28px;
+        box-shadow: var(--shadow);
+        margin-bottom: 18px;
+        position: relative;
+        overflow: hidden
+    }
+
+    .dg-hero:after {
+        content: "";
+        position: absolute;
+        right: -70px;
+        top: -70px;
+        width: 220px;
+        height: 220px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, .08)
+    }
+
+    .dg-title {
+        margin: 0;
+        font-size: 30px;
+        font-weight: 800
+    }
+
+    .dg-sub {
+        margin: 6px 0 0;
+        color: rgba(255, 255, 255, .84);
+        font-size: 14px
+    }
+
+    .dg-cards {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+        margin-bottom: 18px
+    }
+
+    .dg-card {
+        background: var(--surface);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        border: 1px solid rgba(15, 23, 42, .04)
+    }
+
+    .dg-stat {
+        padding: 18px
+    }
+
+    .dg-label {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: .6px;
+        margin-bottom: 8px
+    }
+
+    .dg-value {
+        font-size: 32px;
+        font-weight: 800;
+        line-height: 1
+    }
+
+    .dg-foot {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 8px
+    }
+
+    .dg-panels {
+        display: grid;
+        grid-template-columns: 1.2fr .8fr;
+        gap: 18px
+    }
+
+    .dg-panel {
+        padding: 16px
+    }
+
+    .dg-panel h3 {
+        margin: 0 0 4px;
+        font-size: 18px
+    }
+
+    .dg-panel p {
+        margin: 0 0 14px;
+        color: var(--muted);
+        font-size: 13px
+    }
+
+    .dg-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px
+    }
+
+    .dg-mini {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: var(--surface-2);
+        padding: 14px
+    }
+
+    .dg-mini .k {
+        font-size: 11px;
+        color: var(--muted);
+        font-weight: 800;
+        text-transform: uppercase
+    }
+
+    .dg-mini .v {
+        font-size: 22px;
+        font-weight: 800;
+        margin-top: 6px
+    }
+
+    .dg-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px
+    }
+
+    .dg-item {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: #fff;
+        padding: 14px
+    }
+
+    .dg-item-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        align-items: center
+    }
+
+    .dg-item-title {
+        font-weight: 800
+    }
+
+    .dg-item-meta {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 4px
+    }
+
+    .dg-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 800
+    }
+
+    .ok {
+        background: rgba(25, 135, 84, .12);
+        color: #157347
+    }
+
+    .warn {
+        background: rgba(245, 158, 11, .14);
+        color: #a16207
+    }
+
+    .err {
+        background: rgba(220, 53, 69, .12);
+        color: #b02a37
+    }
+
+    .info {
+        background: rgba(14, 165, 233, .12);
+        color: #0369a1
+    }
+
+    .dg-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 14px
+    }
+
+    .dg-btn {
+        border: 0;
+        border-radius: 14px;
+        padding: 11px 16px;
+        font-weight: 700;
+        font-size: 13px;
+        cursor: pointer
+    }
+
+    .dg-btn-primary {
+        background: var(--primary);
+        color: #fff
+    }
+
+    .dg-btn-light {
+        background: #eef2f7;
+        color: var(--primary)
+    }
+
+    .dg-btn-danger {
+        background: var(--danger);
+        color: #fff
+    }
+
+    .dg-empty {
+        padding: 24px;
+        color: var(--muted);
+        text-align: center
+    }
+
+    @media(max-width:1100px) {
+        .dg-cards {
+            grid-template-columns: repeat(2, minmax(0, 1fr))
+        }
+
+        .dg-panels {
+            grid-template-columns: 1fr
+        }
+    }
+
+    @media(max-width:700px) {
+        .dg-cards {
+            grid-template-columns: 1fr
+        }
+
+        .dg-grid {
+            grid-template-columns: 1fr
+        }
+    }
+</style>
+
+<div class="dg-page">
+    <div class="dg-shell">
+        <div class="dg-hero">
+            <h1 class="dg-title">Dashboard geral do sistema</h1>
+            <div class="dg-sub">Visão consolidada de atendimentos, relatórios PDF, backups e saúde operacional.</div>
+            <div class="dg-actions">
+                <button class="dg-btn dg-btn-light" onclick="DG.atualizar()">Atualizar</button>
+                <button class="dg-btn dg-btn-light" onclick="DG.rodarBackup()">Executar backup agora</button>
+            </div>
+        </div>
+
+        <div class="dg-cards">
+            <div class="dg-card dg-stat">
+                <div class="dg-label">Titulares</div>
+                <div class="dg-value" id="dgTitulares">0</div>
+                <div class="dg-foot">Cadastros principais</div>
+            </div>
+            <div class="dg-card dg-stat">
+                <div class="dg-label">Dependentes</div>
+                <div class="dg-value" id="dgDependentes">0</div>
+                <div class="dg-foot">Vinculados aos titulares</div>
+            </div>
+            <div class="dg-card dg-stat">
+                <div class="dg-label">PDFs no histórico</div>
+                <div class="dg-value" id="dgPdfs">0</div>
+                <div class="dg-foot">Registros em tb_relatorios_pdf</div>
+            </div>
+            <div class="dg-card dg-stat">
+                <div class="dg-label">Último backup</div>
+                <div class="dg-value" id="dgUltimoBackup" style="font-size:18px;line-height:1.25">-</div>
+                <div class="dg-foot">Data/hora do último processo</div>
+            </div>
+        </div>
+
+        <div class="dg-panels">
+            <div class="dg-card dg-panel">
+                <h3>Indicadores operacionais</h3>
+                <p>Resumo rápido do dia e da operação recente.</p>
+                <div class="dg-grid">
+                    <div class="dg-mini">
+                        <div class="k">Atendimentos hoje</div>
+                        <div class="v" id="dgAtendimentosHoje">0</div>
+                    </div>
+                    <div class="dg-mini">
+                        <div class="k">Refeições servidas hoje</div>
+                        <div class="v" id="dgRefeicoesHoje">0</div>
+                    </div>
+                    <div class="dg-mini">
+                        <div class="k">Uploads com sucesso</div>
+                        <div class="v" id="dgUploadsOk">0</div>
+                    </div>
+                    <div class="dg-mini">
+                        <div class="k">Uploads com erro</div>
+                        <div class="v" id="dgUploadsErro">0</div>
+                    </div>
+                    <div class="dg-mini">
+                        <div class="k">Backups com envio</div>
+                        <div class="v" id="dgBackupsEnvio">0</div>
+                    </div>
+                    <div class="dg-mini">
+                        <div class="k">Falhas de backup</div>
+                        <div class="v" id="dgBackupsErro">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dg-card dg-panel">
+                <h3>Saúde do sistema</h3>
+                <p>Leitura direta da situação atual.</p>
+                <div class="dg-list" id="dgSaude"></div>
+            </div>
+        </div>
+
+        <div class="dg-card dg-panel" style="margin-top:18px">
+            <h3>Atividades recentes</h3>
+            <p>Últimos PDFs e últimas execuções de backup.</p>
+            <div class="dg-list" id="dgRecentes">
+                <div class="dg-empty">Carregando dados...</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        const els = {
+            titulares: document.getElementById('dgTitulares'),
+            dependentes: document.getElementById('dgDependentes'),
+            pdfs: document.getElementById('dgPdfs'),
+            ultimoBackup: document.getElementById('dgUltimoBackup'),
+            atendimentosHoje: document.getElementById('dgAtendimentosHoje'),
+            refeicoesHoje: document.getElementById('dgRefeicoesHoje'),
+            uploadsOk: document.getElementById('dgUploadsOk'),
+            uploadsErro: document.getElementById('dgUploadsErro'),
+            backupsEnvio: document.getElementById('dgBackupsEnvio'),
+            backupsErro: document.getElementById('dgBackupsErro'),
+            saude: document.getElementById('dgSaude'),
+            recentes: document.getElementById('dgRecentes')
+        };
+
+        function esc(v) { return String(v == null ? '' : v).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;'); }
+        function fmt(v) { return v ? new Date(String(v).replace(' ', 'T')).toLocaleString('pt-BR') : '-'; }
+
+        function renderSaude(data) {
+            const list = [];
+            list.push(`<div class="dg-item"><div class="dg-item-top"><div class="dg-item-title">Banco remoto</div><span class="dg-badge ${data.remote_db_ok ? 'ok' : 'err'}">${data.remote_db_ok ? '● ONLINE' : '● FALHA'}</span></div><div class="dg-item-meta">${esc(data.remote_db_message || '')}</div></div>`);
+            list.push(`<div class="dg-item"><div class="dg-item-top"><div class="dg-item-title">Envio de backup</div><span class="dg-badge ${data.backup_send_enabled ? 'info' : 'warn'}">${data.backup_send_enabled ? '● ATIVO' : '● DESATIVADO'}</span></div><div class="dg-item-meta">Automação de envio após backup</div></div>`);
+            list.push(`<div class="dg-item"><div class="dg-item-top"><div class="dg-item-title">Relatórios PDF</div><span class="dg-badge ${(data.uploads_erro || 0) > 0 ? 'warn' : 'ok'}">${(data.uploads_erro || 0) > 0 ? '● ATENÇÃO' : '● OK'}</span></div><div class="dg-item-meta">${esc(data.uploads_erro || 0)} erro(s) no histórico.</div></div>`);
+            els.saude.innerHTML = list.join('');
+        }
+
+        function renderRecentes(data) {
+            const blocos = [];
+            (data.recentes_pdfs || []).forEach(item => {
+                blocos.push(`
+                <div class="dg-item">
+                    <div class="dg-item-top">
+                        <div class="dg-item-title">${esc(item.nome_arquivo || 'PDF')}</div>
+                        <span class="dg-badge ${(item.status_upload || '').toUpperCase() === 'SUCESSO' ? 'ok' : 'err'}">${esc(item.status_upload || 'N/D')}</span>
+                    </div>
+                    <div class="dg-item-meta">Responsável: ${esc(item.responsavel || 'Não informado')} • ${fmt(item.data_geracao)}</div>
+                </div>
+            `);
+            });
+            (data.recentes_backups || []).forEach(item => {
+                blocos.push(`
+                <div class="dg-item">
+                    <div class="dg-item-top">
+                        <div class="dg-item-title">Backup ${esc(item.contexto || '')}</div>
+                        <span class="dg-badge ${(item.status || '').toUpperCase() === 'SUCESSO' ? 'ok' : 'err'}">${esc(item.status || 'N/D')}</span>
+                    </div>
+                    <div class="dg-item-meta">${fmt(item.data_execucao)} • ${esc(item.mensagem || '')}</div>
+                </div>
+            `);
+            });
+            els.recentes.innerHTML = blocos.length ? blocos.join('') : `<div class="dg-empty">Sem atividades recentes.</div>`;
+        }
+
+        async function atualizar() {
+            const resp = await fetch('/admin/api/dashboard/geral', { credentials: 'same-origin' });
+            const data = await resp.json();
+            if (!resp.ok || !data.success) {
+                alert(data.message || data.error || 'Falha ao carregar o dashboard.');
+                return;
+            }
+
+            els.titulares.textContent = data.total_titulares || 0;
+            els.dependentes.textContent = data.total_dependentes || 0;
+            els.pdfs.textContent = data.total_pdfs || 0;
+            els.ultimoBackup.textContent = data.ultimo_backup ? fmt(data.ultimo_backup) : '-';
+            els.atendimentosHoje.textContent = data.atendimentos_hoje || 0;
+            els.refeicoesHoje.textContent = data.refeicoes_hoje || 0;
+            els.uploadsOk.textContent = data.uploads_ok || 0;
+            els.uploadsErro.textContent = data.uploads_erro || 0;
+            els.backupsEnvio.textContent = data.backups_envio || 0;
+            els.backupsErro.textContent = data.backups_erro || 0;
+
+            renderSaude(data);
+            renderRecentes(data);
+        }
+
+        async function rodarBackup() {
+            if (!confirm('Deseja executar um backup agora com envio automático?')) return;
+            const resp = await fetch('/admin/api/backup/run-and-send', { method: 'POST', credentials: 'same-origin' });
+            const data = await resp.json();
+            alert(data.message || (data.success ? 'Backup executado.' : 'Falha no backup.'));
+            if (data.success) atualizar();
+        }
+
+        window.DG = { atualizar, rodarBackup };
+        atualizar();
+    })();
+</script>

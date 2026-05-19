@@ -1,0 +1,45 @@
+[2026-03-03 02:05:37] Dia ainda aberto após venda | data=2026-03-02
+[2026-03-03 02:05:42] Dia ainda aberto após venda | data=2026-03-02
+[2026-03-03 02:06:03] Dia ainda aberto após venda | data=2026-03-02
+[2026-03-03 02:07:45] Dia ainda aberto após venda | data=2026-03-02
+[2026-03-03 02:08:11] Dia ainda aberto após venda | data=2026-03-02
+[2026-03-03 02:08:29] Dia ainda aberto após venda | data=2026-03-02
+[2026-03-03 02:08:36] Dia fechado após venda | data=2026-03-02 | total=5 | limite=5
+[2026-03-03 02:08:36] Iniciando gerarRelatorioDia | data=2026-03-02
+[2026-03-03 02:08:36] Procedure sp_gerar_relatorio_dia executada | data=2026-03-02
+[2026-03-03 02:08:36] OK gerarRelatorioDia | data=2026-03-02 | coluna=data | total_encontrado=1
+[2026-03-03 02:10:57] Dia ainda aberto após venda | data=2026-03-02
+[2026-03-03 02:11:01] Dia ainda aberto após venda | data=2026-03-02
+[2026-03-03 02:11:07] Dia ainda aberto após venda | data=2026-03-02
+[2026-03-03 02:11:14] Dia ainda aberto após venda | data=2026-03-02
+[2026-03-03 02:11:27] Dia fechado após venda | data=2026-03-02 | total=5 | limite=5
+[2026-03-03 02:11:27] Iniciando gerarRelatorioDia | data=2026-03-02
+[2026-03-03 02:11:27] Procedure sp_gerar_relatorio_dia executada | data=2026-03-02
+[2026-03-03 02:11:27] OK gerarRelatorioDia | data=2026-03-02 | coluna=data | total_encontrado=1
+[2026-03-03 02:11:49] Dia fechado após venda | data=2026-03-02 | total=5 | limite=5
+[2026-03-03 02:11:49] Iniciando gerarRelatorioDia | data=2026-03-02
+[2026-03-03 02:11:49] Procedure sp_gerar_relatorio_dia executada | data=2026-03-02
+[2026-03-03 02:11:49] OK gerarRelatorioDia | data=2026-03-02 | coluna=data | total_encontrado=1
+[2026-03-03 03:07:22] Dia ainda aberto após venda | data=2026-03-02
+[2026-03-03 03:07:32] Dia ainda aberto após venda | data=2026-03-02
+[2026-03-03 03:07:46] Dia ainda aberto após venda | data=2026-03-02
+[2026-03-03 03:08:23] Dia ainda aberto após venda | data=2026-03-02
+[2026-03-03 03:08:48] Dia ainda aberto após venda | data=2026-03-02
+[2026-03-03 03:09:21] Dia fechado após venda | data=2026-03-02 | total=5 | limite=5
+[2026-03-03 03:09:21] Iniciando gerarRelatorioDia | data=2026-03-02
+[2026-03-03 03:09:21] Procedure sp_gerar_relatorio_dia executada | data=2026-03-02
+[2026-03-03 03:09:21] OK gerarRelatorioDia | data=2026-03-02 | coluna=data | total_encontrado=1
+[2026-03-03 03:20:18] Dia ainda aberto após venda | data=2026-03-02
+[2026-03-03 04:50:33] Dia ainda aberto após venda | data=2026-03-02
+[2026-03-03 04:51:00] Dia fechado após venda | data=2026-03-02 | total=5 | limite=5
+[2026-03-03 04:51:00] Iniciando gerarRelatorioDia | data=2026-03-02
+[2026-03-03 04:51:00] Procedure sp_gerar_relatorio_dia executada | data=2026-03-02
+[2026-03-03 04:51:00] OK gerarRelatorioDia | data=2026-03-02 | coluna=data | total_encontrado=1
+[2026-03-03 20:47:44] Dia ainda aberto após venda | data=2026-03-03
+[2026-03-03 21:07:23] Dia ainda aberto após venda | data=2026-03-03
+[2026-03-03 21:08:26] Dia fechado após venda | data=2026-03-03 | total=5 | limite=5
+[2026-03-03 21:08:26] Iniciando gerarRelatorioDia | data=2026-03-03
+[2026-03-03 21:08:26] Procedure sp_gerar_relatorio_dia executada | data=2026-03-03
+[2026-03-03 21:08:26] OK gerarRelatorioDia | data=2026-03-03 | coluna=data | total_encontrado=1
+[2026-03-05 19:51:16] Dia ainda aberto após venda | data=2026-03-05
+[2026-03-05 19:51:52] Dia ainda aberto após venda | data=2026-03-05

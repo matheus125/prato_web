@@ -1,0 +1,9 @@
+[2026-05-07 12:02:06] ERRO update para 1.0.1: Download do ZIP retornou HTTP 404.
+[2026-05-07 12:02:06] ERRO apply update: Download do ZIP retornou HTTP 404.
+[2026-05-07 12:03:30] ERRO update para 1.0.1: Download do ZIP retornou HTTP 404.
+[2026-05-07 12:03:30] ERRO apply update: Download do ZIP retornou HTTP 404.
+[2026-05-07 12:14:49] ERRO update para 1.0.1: Nao foi possivel baixar o ZIP de atualizacao. Verifique a internet. Detalhe: Recv failure: Connection was reset
+[2026-05-07 12:14:49] ERRO apply update: Nao foi possivel baixar o ZIP de atualizacao. Verifique a internet. Detalhe: Recv failure: Connection was reset
+[2026-05-07 12:16:33] SUCESSO update 1.0.0 -> 1.0.1 | backup: backup-sistema-1.0.0-para-1.0.1-20260507-121607.zip
+[2026-05-13 15:46:15] ERRO update para 1.0.2: Nao foi possivel baixar o ZIP de atualizacao. Verifique a internet. Detalhe: Operation timed out after 120018 milliseconds with 7860000 out of 104995861 bytes received
+[2026-05-13 15:46:15] ERRO apply update: Nao foi possivel baixar o ZIP de atualizacao. Verifique a internet. Detalhe: Operation timed out after 120018 milliseconds with 7860000 out of 104995861 bytes received
