@@ -34,6 +34,11 @@ if (!function_exists('atualizadorConfig')) {
             'remote_version_url' => '',
             'protected_paths' => array(
                 '.env',
+                '.env.local',
+                '.env.production',
+                '.env.prod',
+                '.env.development',
+                '.env.dev',
                 'config.php',
                 'config/paths.php',
                 'app/config/database.php',
@@ -225,11 +230,15 @@ if (!function_exists('atualizadorHttpDownload')) {
     function atualizadorHttpDownload($url, $destino, $config)
     {
         $url = atualizadorUrlConfigurada($url);
-        $downloadTimeout = isset($config['download_timeout']) ? (int)$config['download_timeout'] : 120;
+        $downloadTimeout = isset($config['download_timeout']) ? (int)$config['download_timeout'] : 900;
         if ($downloadTimeout <= 0) {
-            $downloadTimeout = 120;
+            $downloadTimeout = 900;
         }
-        $downloadTimeout = max(15, min($downloadTimeout, 180));
+        $downloadTimeout = max(60, $downloadTimeout);
+        $downloadRetries = isset($config['download_retries']) ? (int)$config['download_retries'] : 5;
+        $downloadRetries = max(1, min($downloadRetries, 10));
+        $lowSpeedLimit = isset($config['download_low_speed_limit']) ? (int)$config['download_low_speed_limit'] : 1024;
+        $lowSpeedTime = isset($config['download_low_speed_time']) ? (int)$config['download_low_speed_time'] : 120;
 
         $dir = dirname($destino);
         if (!is_dir($dir)) {
@@ -237,33 +246,83 @@ if (!function_exists('atualizadorHttpDownload')) {
         }
 
         if (function_exists('curl_init')) {
-            $fp = fopen($destino, 'wb');
-            if (!$fp) {
-                throw new Exception('Nao foi possivel criar o arquivo temporario do pacote.');
+            $parcial = $destino . '.part';
+            @unlink($destino);
+            $ultimoErro = '';
+            $ultimoStatus = 0;
+
+            for ($tentativa = 1; $tentativa <= $downloadRetries; $tentativa++) {
+                $bytesExistentes = is_file($parcial) ? filesize($parcial) : 0;
+                $fp = fopen($parcial, $bytesExistentes > 0 ? 'ab' : 'wb');
+                if (!$fp) {
+                    throw new Exception('Nao foi possivel criar o arquivo temporario do pacote.');
+                }
+
+                $ch = curl_init($url);
+                curl_setopt($ch, CURLOPT_FILE, $fp);
+                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+                curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 20);
+                curl_setopt($ch, CURLOPT_TIMEOUT, $downloadTimeout);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, empty($config['allow_insecure_ssl']));
+                curl_setopt($ch, CURLOPT_USERAGENT, 'PratoCheio-Updater/1.0');
+                if ($lowSpeedLimit > 0 && $lowSpeedTime > 0) {
+                    curl_setopt($ch, CURLOPT_LOW_SPEED_LIMIT, $lowSpeedLimit);
+                    curl_setopt($ch, CURLOPT_LOW_SPEED_TIME, $lowSpeedTime);
+                }
+                if ($bytesExistentes > 0) {
+                    curl_setopt($ch, CURLOPT_RESUME_FROM, $bytesExistentes);
+                }
+
+                $ok = curl_exec($ch);
+                $errno = curl_errno($ch);
+                $error = curl_error($ch);
+                $status = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                curl_close($ch);
+                fclose($fp);
+
+                $ultimoErro = $error;
+                $ultimoStatus = $status;
+
+                if ($bytesExistentes > 0 && $status === 200) {
+                    @unlink($parcial);
+                    atualizadorLog('Download do ZIP reiniciado porque o servidor nao aceitou retomada.');
+                    continue;
+                }
+
+                if ($ok && !$errno && $status < 400) {
+                    if (!@rename($parcial, $destino)) {
+                        @unlink($destino);
+                        if (!@rename($parcial, $destino)) {
+                            throw new Exception('Nao foi possivel finalizar o arquivo ZIP baixado.');
+                        }
+                    }
+                    break;
+                }
+
+                $baixados = is_file($parcial) ? filesize($parcial) : 0;
+                atualizadorLog(
+                    'Tentativa ' . $tentativa . '/' . $downloadRetries .
+                    ' falhou ao baixar ZIP | status=' . $status .
+                    ' | bytes=' . $baixados .
+                    ' | erro=' . ($error !== '' ? $error : 'sem detalhe')
+                );
+
+                if ($status >= 400 && $status !== 408 && $status !== 429 && $status < 500) {
+                    @unlink($parcial);
+                    throw new Exception('Download do ZIP retornou HTTP ' . $status . '.');
+                }
+
+                if ($tentativa < $downloadRetries) {
+                    sleep(1);
+                }
             }
 
-            $ch = curl_init($url);
-            curl_setopt($ch, CURLOPT_FILE, $fp);
-            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
-            curl_setopt($ch, CURLOPT_TIMEOUT, $downloadTimeout);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, empty($config['allow_insecure_ssl']));
-            curl_setopt($ch, CURLOPT_USERAGENT, 'PratoCheio-Updater/1.0');
-
-            $ok = curl_exec($ch);
-            $errno = curl_errno($ch);
-            $error = curl_error($ch);
-            $status = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            curl_close($ch);
-            fclose($fp);
-
-            if (!$ok || $errno) {
-                @unlink($destino);
-                throw new Exception('Nao foi possivel baixar o ZIP de atualizacao. Verifique a internet. Detalhe: ' . $error);
-            }
-            if ($status >= 400) {
-                @unlink($destino);
-                throw new Exception('Download do ZIP retornou HTTP ' . $status . '.');
+            if (!is_file($destino)) {
+                $baixados = is_file($parcial) ? filesize($parcial) : 0;
+                throw new Exception(
+                    'Nao foi possivel baixar o ZIP de atualizacao. O download parcial foi preservado para continuar na proxima tentativa. ' .
+                    'Bytes baixados: ' . $baixados . '. Detalhe: ' . ($ultimoErro !== '' ? $ultimoErro : 'HTTP ' . $ultimoStatus)
+                );
             }
         } else {
             $context = stream_context_create(array(
@@ -667,6 +726,135 @@ if (!function_exists('atualizadorAplicarArquivos')) {
     }
 }
 
+if (!function_exists('atualizadorEnvChaveProtegida')) {
+    function atualizadorEnvChaveProtegida($key)
+    {
+        return preg_match('/^DB_/i', (string)$key) === 1;
+    }
+}
+
+if (!function_exists('atualizadorEnvLerUpdate')) {
+    function atualizadorEnvLerUpdate($arquivo)
+    {
+        if (!is_file($arquivo)) {
+            return array(
+                'values' => array(),
+                'ignored' => 0
+            );
+        }
+
+        $linhas = file($arquivo, FILE_IGNORE_NEW_LINES);
+        if ($linhas === false) {
+            throw new Exception('Nao foi possivel ler .env.update.');
+        }
+
+        $values = array();
+        $ignored = 0;
+        foreach ($linhas as $linha) {
+            if (!preg_match('/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=(.*)$/', $linha, $match)) {
+                continue;
+            }
+
+            $key = $match[1];
+            if (atualizadorEnvChaveProtegida($key)) {
+                $ignored++;
+                continue;
+            }
+
+            $values[$key] = $key . '=' . $match[2];
+        }
+
+        return array(
+            'values' => $values,
+            'ignored' => $ignored
+        );
+    }
+}
+
+if (!function_exists('atualizadorAplicarEnvUpdate')) {
+    function atualizadorAplicarEnvUpdate($sourceDir)
+    {
+        $sourceUpdate = rtrim($sourceDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . '.env.update';
+        $rootUpdate = ROOT_DIR . DIRECTORY_SEPARATOR . '.env.update';
+        $updateFile = is_file($sourceUpdate) ? $sourceUpdate : $rootUpdate;
+
+        if (!is_file($updateFile)) {
+            return array(
+                'found' => false,
+                'updated' => 0,
+                'added' => 0,
+                'ignored' => 0
+            );
+        }
+
+        $update = atualizadorEnvLerUpdate($updateFile);
+        $values = $update['values'];
+        $ignored = $update['ignored'];
+
+        if (empty($values)) {
+            if (is_file($rootUpdate)) {
+                @unlink($rootUpdate);
+            }
+
+            return array(
+                'found' => true,
+                'updated' => 0,
+                'added' => 0,
+                'ignored' => $ignored
+            );
+        }
+
+        $envFile = ROOT_DIR . DIRECTORY_SEPARATOR . '.env';
+        $linhas = is_file($envFile) ? file($envFile, FILE_IGNORE_NEW_LINES) : array();
+        if ($linhas === false) {
+            throw new Exception('Nao foi possivel ler o .env local.');
+        }
+
+        $updated = 0;
+        $seen = array();
+        foreach ($linhas as $idx => $linha) {
+            if (!preg_match('/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=/', $linha, $match)) {
+                continue;
+            }
+
+            $key = $match[1];
+            if (atualizadorEnvChaveProtegida($key)) {
+                continue;
+            }
+
+            if (array_key_exists($key, $values)) {
+                $linhas[$idx] = $values[$key];
+                $seen[$key] = true;
+                $updated++;
+            }
+        }
+
+        $added = 0;
+        foreach ($values as $key => $line) {
+            if (!isset($seen[$key])) {
+                $linhas[] = $line;
+                $added++;
+            }
+        }
+
+        $conteudo = implode(PHP_EOL, $linhas) . PHP_EOL;
+        if (file_put_contents($envFile, $conteudo) === false) {
+            throw new Exception('Nao foi possivel gravar o .env local com as variaveis globais.');
+        }
+
+        if (is_file($rootUpdate)) {
+            @unlink($rootUpdate);
+        }
+
+        return array(
+            'found' => true,
+            'updated' => $updated,
+            'added' => $added,
+            'ignored' => $ignored
+        );
+    }
+}
+
 if (!function_exists('atualizadorLimparCacheViews')) {
     function atualizadorLimparCacheViews()
     {
@@ -754,7 +942,7 @@ if (!function_exists('atualizadorAplicarAtualizacao')) {
         $config = atualizadorConfig();
         $remote = isset($check['remote']) && is_array($check['remote']) ? $check['remote'] : array();
         $tempBase = atualizadorTempBase();
-        $zipFile = $tempBase . DIRECTORY_SEPARATOR . 'sistema-' . preg_replace('/[^a-zA-Z0-9_.-]+/', '-', $check['remote_version']) . '-' . time() . '.zip';
+        $zipFile = $tempBase . DIRECTORY_SEPARATOR . 'sistema-' . preg_replace('/[^a-zA-Z0-9_.-]+/', '-', $check['remote_version']) . '.zip';
         $extractDir = $tempBase . DIRECTORY_SEPARATOR . 'extract-' . date('Ymd-His') . '-' . mt_rand(1000, 9999);
 
         try {
@@ -777,10 +965,17 @@ if (!function_exists('atualizadorAplicarAtualizacao')) {
             $sourceDir = atualizadorDetectarRaizPacote($extractDir);
             $backup = atualizadorCriarBackupSistema($check['local_version'], $check['remote_version']);
             $copiados = atualizadorAplicarArquivos($sourceDir, isset($config['protected_paths']) ? $config['protected_paths'] : array());
+            $envUpdate = atualizadorAplicarEnvUpdate($sourceDir);
             $cache = atualizadorLimparCacheViews();
             $versaoLocal = atualizadorSalvarVersaoLocal($remote);
 
-            atualizadorLog('SUCESSO update ' . $check['local_version'] . ' -> ' . $check['remote_version'] . ' | backup: ' . basename($backup));
+            atualizadorLog(
+                'SUCESSO update ' . $check['local_version'] . ' -> ' . $check['remote_version'] .
+                ' | backup: ' . basename($backup) .
+                ' | env_update: updated=' . $envUpdate['updated'] .
+                ', added=' . $envUpdate['added'] .
+                ', ignored=' . $envUpdate['ignored']
+            );
 
             if (is_file($zipFile) && atualizadorDentroDe($zipFile, $tempBase)) {
                 @unlink($zipFile);
@@ -795,6 +990,7 @@ if (!function_exists('atualizadorAplicarAtualizacao')) {
                 'remote_version' => $check['remote_version'],
                 'backup_file' => $backup,
                 'files' => $copiados,
+                'env_update' => $envUpdate,
                 'cache_removed' => $cache
             );
         } catch (Exception $e) {
@@ -849,7 +1045,7 @@ if (isset($app)) {
             $force = isset($_POST['force']) && (int)$_POST['force'] === 1;
 
             if (function_exists('set_time_limit')) {
-                @set_time_limit(300);
+                @set_time_limit(1800);
             }
 
             if (session_status() === PHP_SESSION_ACTIVE) {

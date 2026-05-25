@@ -1370,11 +1370,11 @@ if (!function_exists('obterDiretorioPublicoRelatorioLocal')) {
 
         $relativeDir = isset($config['local_public_dir'])
             ? trim((string)$config['local_public_dir'])
-            : 'relatorios';
+            : 'prato/relatorios';
 
         $relativeDir = trim(str_replace('\\', '/', $relativeDir), '/');
         if ($relativeDir === '') {
-            $relativeDir = 'relatorios';
+            $relativeDir = 'prato/relatorios';
         }
 
         return rtrim($baseDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $relativeDir);
@@ -1386,11 +1386,20 @@ if (!function_exists('montarUrlPublicaRelatorioLocal')) {
     {
         $relativeDir = isset($config['local_public_dir'])
             ? trim((string)$config['local_public_dir'])
-            : 'relatorios';
+            : 'prato/relatorios';
 
         $relativeDir = trim(str_replace('\\', '/', $relativeDir), '/');
         if ($relativeDir === '') {
-            $relativeDir = 'relatorios';
+            $relativeDir = 'prato/relatorios';
+        }
+
+        $publicBaseUrl = trim((string) ($config['public_base_url'] ?? ''));
+        if ($publicBaseUrl === '') {
+            $publicBaseUrl = 'https://prato-cheio.ms-tecnologia.app.br/prato/relatorios';
+        }
+
+        if ($publicBaseUrl !== '') {
+            return rtrim($publicBaseUrl, '/') . '/' . rawurlencode($nomeArquivo);
         }
 
         $path = '/' . $relativeDir . '/' . rawurlencode($nomeArquivo);
@@ -1404,6 +1413,45 @@ if (!function_exists('montarUrlPublicaRelatorioLocal')) {
             || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower((string)$_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https');
 
         return ($https ? 'https://' : 'http://') . $host . $path;
+    }
+}
+
+if (!function_exists('validarUrlPublicaRelatorio')) {
+    function validarUrlPublicaRelatorio($url, $tentativas = 3)
+    {
+        $url = trim((string)$url);
+        if ($url === '' || !preg_match('#^https?://#i', $url)) {
+            return false;
+        }
+
+        $tentativas = max(1, (int)$tentativas);
+        for ($i = 1; $i <= $tentativas; $i++) {
+            $ch = curl_init($url);
+            curl_setopt_array($ch, array(
+                CURLOPT_NOBODY => true,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_CONNECTTIMEOUT => 10,
+                CURLOPT_TIMEOUT => 20,
+                CURLOPT_SSL_VERIFYPEER => true,
+                CURLOPT_USERAGENT => 'PratoCheio-RelatorioUpload/1.0'
+            ));
+
+            curl_exec($ch);
+            $errno = curl_errno($ch);
+            $status = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+            if (!$errno && $status >= 200 && $status < 400) {
+                return true;
+            }
+
+            if ($i < $tentativas) {
+                sleep(1);
+            }
+        }
+
+        return false;
     }
 }
 
@@ -1427,11 +1475,11 @@ if (!function_exists('salvarRelatorioLocalmente')) {
 
         $relativeDir = isset($config['local_public_dir'])
             ? trim((string)$config['local_public_dir'])
-            : 'relatorios';
+            : 'prato/relatorios';
 
         $relativeDir = trim(str_replace('\\', '/', $relativeDir), '/');
         if ($relativeDir === '') {
-            $relativeDir = 'relatorios';
+            $relativeDir = 'prato/relatorios';
         }
 
         return array(
@@ -1443,25 +1491,105 @@ if (!function_exists('salvarRelatorioLocalmente')) {
     }
 }
 
+if (!function_exists('uploadRelatorioSftp')) {
+    function uploadRelatorioSftp(array $config, $caminhoLocal, $nomeArquivo)
+    {
+        $host = trim((string) ($config['sftp_host'] ?? ''));
+        $user = trim((string) ($config['sftp_user'] ?? ''));
+        $pass = (string) ($config['sftp_pass'] ?? '');
+        $port = (int) ($config['sftp_port'] ?? 22);
+        $uploadDir = trim((string) ($config['sftp_remote_dir'] ?? ''));
+
+        if ($host === '' || $user === '' || $pass === '' || $uploadDir === '') {
+            throw new Exception('Configuração SFTP de relatórios incompleta.');
+        }
+
+        $nomeSeguro = basename(str_replace('\\', '/', (string)$nomeArquivo));
+        $uploadPath = rtrim($uploadDir, '/') . '/' . $nomeSeguro;
+        $remoteDirPublico = '/' . ltrim((string) ($config['remote_dir'] ?? '/prato/relatorios'), '/');
+        $publicBaseUrl = trim((string) ($config['public_base_url'] ?? ''));
+        if ($publicBaseUrl === '') {
+            $publicBaseUrl = 'https://prato-cheio.ms-tecnologia.app.br/prato/relatorios';
+        }
+
+        $fp = fopen($caminhoLocal, 'r');
+        if (!$fp) {
+            throw new Exception('Erro ao abrir arquivo local: ' . $caminhoLocal);
+        }
+
+        $ch = curl_init();
+        curl_setopt_array($ch, array(
+            CURLOPT_URL => 'sftp://' . $host . ':' . $port . $uploadPath,
+            CURLOPT_USERPWD => $user . ':' . $pass,
+            CURLOPT_UPLOAD => true,
+            CURLOPT_INFILE => $fp,
+            CURLOPT_INFILESIZE => filesize($caminhoLocal),
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT => 180,
+            CURLOPT_SSH_AUTH_TYPES => CURLSSH_AUTH_PASSWORD,
+            CURLOPT_VERBOSE => false
+        ));
+
+        $result = curl_exec($ch);
+        $error = curl_error($ch);
+        $errno = curl_errno($ch);
+
+        curl_close($ch);
+        fclose($fp);
+
+        if ($errno) {
+            throw new Exception('Erro SFTP (' . $errno . '): ' . $error);
+        }
+
+        if ($result === false) {
+            throw new Exception('Falha no upload SFTP sem retorno válido.');
+        }
+
+        $urlPublica = rtrim($publicBaseUrl, '/') . '/' . rawurlencode($nomeSeguro);
+        if (!validarUrlPublicaRelatorio($urlPublica)) {
+            throw new Exception('Upload SFTP concluido, mas a URL publica nao respondeu: ' . $urlPublica . '. Verifique RELATORIO_SFTP_REMOTE_DIR e RELATORIO_PUBLIC_BASE_URL.');
+        }
+
+        return array(
+            'success' => true,
+            'driver' => 'sftp',
+            'remote_file' => $remoteDirPublico . '/' . $nomeSeguro,
+            'url_publica' => $urlPublica
+        );
+    }
+}
+
 if (!function_exists('uploadRelatorioRemoto')) {
     function uploadRelatorioRemoto(array $config, $caminhoLocal, $nomeArquivo)
     {
         $driver = strtolower(trim((string) ($config['driver'] ?? 'ftp')));
+        if ($driver === 'sftp') {
+            return uploadRelatorioSftp($config, $caminhoLocal, $nomeArquivo);
+        }
+
         $ftpUser = trim((string) ($config['user'] ?? ''));
         $ftpPass = (string) ($config['pass'] ?? '');
 
-        if ($driver === 'local' || $driver === 'file' || $driver === 'filesystem' || $ftpUser === '' || $ftpPass === '') {
+        if ($driver === 'local' || $driver === 'file' || $driver === 'filesystem') {
             return salvarRelatorioLocalmente($config, $caminhoLocal, $nomeArquivo);
+        }
+
+        if ($ftpUser === '' || $ftpPass === '') {
+            throw new Exception('Configuracao FTP incompleta. Para salvar na hospedagem, defina RELATORIO_UPLOAD_DRIVER=sftp e as variaveis RELATORIO_SFTP_* no .env.');
         }
 
         try {
             $ftpHost = normalizarHostFtpRelatorio($config);
         } catch (\Exception $e) {
-            return salvarRelatorioLocalmente($config, $caminhoLocal, $nomeArquivo);
+            throw $e;
         }
 
-        $remoteDir = '/' . ltrim((string) ($config['remote_dir'] ?? '/relatorios'), '/');
-        $publicBaseUrl = rtrim((string) ($config['public_base_url'] ?? ''), '/') . '/';
+        $remoteDir = '/' . ltrim((string) ($config['remote_dir'] ?? '/prato/relatorios'), '/');
+        $publicBaseUrl = trim((string) ($config['public_base_url'] ?? ''));
+        if ($publicBaseUrl === '') {
+            $publicBaseUrl = 'https://prato-cheio.ms-tecnologia.app.br/prato/relatorios';
+        }
+        $publicBaseUrl = rtrim($publicBaseUrl, '/') . '/';
 
         $remoteFile = $remoteDir . '/' . ltrim($nomeArquivo, '/');
 
@@ -1500,11 +1628,16 @@ if (!function_exists('uploadRelatorioRemoto')) {
             throw new Exception('Falha no upload FTP sem retorno válido.');
         }
 
+        $urlPublica = $publicBaseUrl . rawurlencode($nomeArquivo);
+        if (!validarUrlPublicaRelatorio($urlPublica)) {
+            throw new Exception('Upload FTP concluido, mas a URL publica nao respondeu: ' . $urlPublica . '. Verifique RELATORIO_REMOTE_DIR e RELATORIO_PUBLIC_BASE_URL.');
+        }
+
         return array(
             'success' => true,
             'driver' => 'ftp',
             'remote_file' => $remoteFile,
-            'url_publica' => $publicBaseUrl . rawurlencode($nomeArquivo)
+            'url_publica' => $urlPublica
         );
     }
 }

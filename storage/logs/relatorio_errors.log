@@ -1149,3 +1149,52 @@
 [2026-05-18 16:55:08] Iniciando gerarRelatorioDia | data=2026-05-18
 [2026-05-18 16:55:08] UPSERT tb_relatorios executado | data=2026-05-18 | total=1 | faixas=1 | genericas=0 | nao_classificados=0
 [2026-05-18 16:55:08] OK gerarRelatorioDia | data=2026-05-18 | coluna=data | total_encontrado=1
+[2026-05-19 09:32:14] Dia ainda aberto após venda | data=2026-05-19
+[2026-05-19 09:32:19] Iniciando gerarRelatorioDia | data=2026-05-19
+[2026-05-19 09:32:19] UPSERT tb_relatorios executado | data=2026-05-19 | total=1 | faixas=0 | genericas=1 | nao_classificados=0
+[2026-05-19 09:32:19] OK gerarRelatorioDia | data=2026-05-19 | coluna=data | total_encontrado=1
+[2026-05-19 10:44:19] Dia ainda aberto após venda | data=2026-05-19
+[2026-05-19 11:04:24] Dia ainda aberto após venda | data=2026-05-19
+[2026-05-19 11:04:31] Dia ainda aberto após venda | data=2026-05-19
+[2026-05-20 12:59:42] Dia ainda aberto após venda | data=2026-05-20
+[2026-05-20 12:59:44] Dia ainda aberto após venda | data=2026-05-20
+[2026-05-20 12:59:45] Dia ainda aberto após venda | data=2026-05-20
+[2026-05-20 12:59:50] Iniciando gerarRelatorioDia | data=2026-05-20
+[2026-05-20 12:59:50] UPSERT tb_relatorios executado | data=2026-05-20 | total=3 | faixas=0 | genericas=3 | nao_classificados=0
+[2026-05-20 12:59:50] OK gerarRelatorioDia | data=2026-05-20 | coluna=data | total_encontrado=1
+[2026-05-20 12:59:50] Iniciando gerarRelatorioDia | data=2026-05-20
+[2026-05-20 12:59:50] UPSERT tb_relatorios executado | data=2026-05-20 | total=3 | faixas=0 | genericas=3 | nao_classificados=0
+[2026-05-20 12:59:50] OK gerarRelatorioDia | data=2026-05-20 | coluna=data | total_encontrado=1
+[2026-05-20 12:59:54] Iniciando gerarRelatorioDia | data=2026-05-20
+[2026-05-20 12:59:54] UPSERT tb_relatorios executado | data=2026-05-20 | total=3 | faixas=0 | genericas=3 | nao_classificados=0
+[2026-05-20 12:59:54] OK gerarRelatorioDia | data=2026-05-20 | coluna=data | total_encontrado=1
+[2026-05-20 12:59:54] Iniciando gerarRelatorioDia | data=2026-05-20
+[2026-05-20 12:59:54] UPSERT tb_relatorios executado | data=2026-05-20 | total=3 | faixas=0 | genericas=3 | nao_classificados=0
+[2026-05-20 12:59:54] OK gerarRelatorioDia | data=2026-05-20 | coluna=data | total_encontrado=1
+[2026-05-20 12:59:59] Iniciando gerarRelatorioDia | data=2026-05-20
+[2026-05-20 12:59:59] UPSERT tb_relatorios executado | data=2026-05-20 | total=3 | faixas=0 | genericas=3 | nao_classificados=0
+[2026-05-20 12:59:59] OK gerarRelatorioDia | data=2026-05-20 | coluna=data | total_encontrado=1
+[2026-05-20 13:00:07] Iniciando gerarRelatorioDia | data=2026-05-20
+[2026-05-20 13:00:07] UPSERT tb_relatorios executado | data=2026-05-20 | total=3 | faixas=0 | genericas=3 | nao_classificados=0
+[2026-05-20 13:00:07] OK gerarRelatorioDia | data=2026-05-20 | coluna=data | total_encontrado=1
+[2026-05-20 13:37:05] Iniciando gerarRelatorioDia | data=2026-05-20
+[2026-05-20 13:37:05] UPSERT tb_relatorios executado | data=2026-05-20 | total=3 | faixas=0 | genericas=3 | nao_classificados=0
+[2026-05-20 13:37:05] OK gerarRelatorioDia | data=2026-05-20 | coluna=data | total_encontrado=1
+[2026-05-20 14:10:29] Iniciando gerarRelatorioDia | data=2026-05-20
+[2026-05-20 14:10:29] UPSERT tb_relatorios executado | data=2026-05-20 | total=3 | faixas=0 | genericas=3 | nao_classificados=0
+[2026-05-20 14:10:29] OK gerarRelatorioDia | data=2026-05-20 | coluna=data | total_encontrado=1
+[2026-05-20 14:10:40] Iniciando gerarRelatorioDia | data=2026-05-20
+[2026-05-20 14:10:40] UPSERT tb_relatorios executado | data=2026-05-20 | total=3 | faixas=0 | genericas=3 | nao_classificados=0
+[2026-05-20 14:10:40] OK gerarRelatorioDia | data=2026-05-20 | coluna=data | total_encontrado=1
+[2026-05-20 14:12:00] Iniciando gerarRelatorioDia | data=2026-05-20
+[2026-05-20 14:12:00] UPSERT tb_relatorios executado | data=2026-05-20 | total=3 | faixas=0 | genericas=3 | nao_classificados=0
+[2026-05-20 14:12:00] OK gerarRelatorioDia | data=2026-05-20 | coluna=data | total_encontrado=1
+[2026-05-20 14:12:00] Iniciando gerarRelatorioDia | data=2026-05-20
+[2026-05-20 14:12:00] UPSERT tb_relatorios executado | data=2026-05-20 | total=3 | faixas=0 | genericas=3 | nao_classificados=0
+[2026-05-20 14:12:00] OK gerarRelatorioDia | data=2026-05-20 | coluna=data | total_encontrado=1
+[2026-05-20 14:12:04] Iniciando gerarRelatorioDia | data=2026-05-20
+[2026-05-20 14:12:04] UPSERT tb_relatorios executado | data=2026-05-20 | total=3 | faixas=0 | genericas=3 | nao_classificados=0
+[2026-05-20 14:12:04] OK gerarRelatorioDia | data=2026-05-20 | coluna=data | total_encontrado=1
+[2026-05-20 14:12:25] Iniciando gerarRelatorioDia | data=2026-05-20
+[2026-05-20 14:12:25] UPSERT tb_relatorios executado | data=2026-05-20 | total=3 | faixas=0 | genericas=3 | nao_classificados=0
+[2026-05-20 14:12:25] OK gerarRelatorioDia | data=2026-05-20 | coluna=data | total_encontrado=1

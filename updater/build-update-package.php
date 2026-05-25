@@ -25,6 +25,11 @@ if ($zip->open($out, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
 
 $protectedFiles = array(
     '.env',
+    '.env.local',
+    '.env.production',
+    '.env.prod',
+    '.env.development',
+    '.env.dev',
     'config.php',
     'config/paths.php',
     'app/config/database.php',
@@ -35,11 +40,19 @@ $protectedFiles = array(
 );
 
 $protectedDirs = array(
+    '.git/',
+    '.agents/',
+    '.codex/',
+    'node_modules/',
     'uploads/',
     'storage/',
     'logs/',
     'views-cache/',
     'vendor/',
+    'database/sql/sql/',
+    'public/res/admin/dist/assets/img/',
+    'public/relatorios/',
+    'public/prato/relatorios/',
     'backups/'
 );
 
@@ -56,8 +69,14 @@ foreach ($it as $item) {
 
     $path = $item->getPathname();
     $relative = str_replace('\\', '/', substr($path, strlen($root) + 1));
+    $basename = basename($relative);
 
-    if (in_array($relative, $protectedFiles, true)) {
+    if (
+        in_array($relative, $protectedFiles, true)
+        || ($basename !== '.env.update' && preg_match('/^\.env(\.|$)/', $basename))
+        || preg_match('/\.map$/i', $basename)
+        || preg_match('/\.zip$/i', $basename)
+    ) {
         continue;
     }
 

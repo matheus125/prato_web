@@ -11,11 +11,22 @@ return array(
     'backup_path' => __DIR__ . '/../backups/updates/',
 
     // Tempo limite para download
-    'download_timeout' => 120,
+    'download_timeout' => 900,
+    'download_retries' => 5,
+    'download_low_speed_limit' => 1024,
+    'download_low_speed_time' => 120,
 
-    // Estes caminhos NÃO serão sobrescritos pelo pacote ZIP
+    // Estes caminhos NÃO serão sobrescritos pelo pacote ZIP.
+    // O .env local guarda DB_HOST, DB_PORT, DB_NAME, DB_USER e DB_PASSWORD
+    // exclusivos de cada unidade e deve permanecer fora das atualizações.
+    // Variáveis globais podem ser distribuídas por .env.update e mescladas no .env.
     'protected_paths' => array(
         '.env',
+        '.env.local',
+        '.env.production',
+        '.env.prod',
+        '.env.development',
+        '.env.dev',
         'config.php',
         'config/paths.php',
         'app/config/database.php',

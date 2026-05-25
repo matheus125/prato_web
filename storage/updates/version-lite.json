@@ -1,0 +1,6 @@
+{
+    "version": "1.0.7",
+    "url": "https://prato-cheio.ms-tecnologia.app.br/prato/updates/sistema-v1.0.7.zip",
+    "notes": "Pacote leve com correcoes no envio de relatorios e leitura compatível do .env.update.",
+    "sha256": "120a59c6c0dce41b01bfa56be744fb87af5f82d368481cb7be88310af1f2ac10"
+}

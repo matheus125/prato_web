@@ -57,6 +57,55 @@ if (!function_exists('pc_load_env')) {
     }
 }
 
+if (!function_exists('pc_load_env_update')) {
+    function pc_load_env_update($path = null): void
+    {
+        static $loaded = array();
+
+        if ($path === null) {
+            $root = defined('ROOT_DIR') ? ROOT_DIR : dirname(__DIR__);
+            $path = $root . DIRECTORY_SEPARATOR . '.env.update';
+        }
+
+        $real = realpath($path);
+        if ($real === false || isset($loaded[$real]) || !is_file($real)) {
+            return;
+        }
+
+        $loaded[$real] = true;
+        $lines = file($real, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        if (!is_array($lines)) {
+            return;
+        }
+
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if ($line === '' || strpos($line, '#') === 0 || strpos($line, '=') === false) {
+                continue;
+            }
+
+            [$key, $value] = explode('=', $line, 2);
+            $key = trim($key);
+            $value = trim($value);
+
+            if ($key === '' || preg_match('/^[A-Z0-9_]+$/i', $key) !== 1 || preg_match('/^DB_/i', $key)) {
+                continue;
+            }
+
+            if (
+                strlen($value) >= 2 &&
+                (($value[0] === '"' && substr($value, -1) === '"') || ($value[0] === "'" && substr($value, -1) === "'"))
+            ) {
+                $value = substr($value, 1, -1);
+            }
+
+            putenv($key . '=' . $value);
+            $_ENV[$key] = $value;
+            $_SERVER[$key] = $value;
+        }
+    }
+}
+
 if (!function_exists('pc_env')) {
     function pc_env(string $key, $default = null)
     {
@@ -91,3 +140,4 @@ if (!function_exists('pc_env_bool')) {
 }
 
 pc_load_env();
+pc_load_env_update();

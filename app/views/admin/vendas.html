@@ -720,6 +720,9 @@
         if (!resp.ok) {
 
             let msg = data?.error || `HTTP ${resp.status} - ${text.slice(0, 300)}`;
+            if (data?.details) {
+                msg += `\n\nDetalhes: ${data.details}`;
+            }
 
             if (data?.duplicados && Array.isArray(data.duplicados) && data.duplicados.length) {
                 msg += `\n\nClientes já compraram hoje:\n- ${data.duplicados.join("\n- ")}`;
@@ -730,6 +733,9 @@
 
         if (!data?.ok) {
             let msg = data?.error || `Resposta inválida: ${text.slice(0, 300)}`;
+            if (data?.details) {
+                msg += `\n\nDetalhes: ${data.details}`;
+            }
 
             if (data?.duplicados && Array.isArray(data.duplicados) && data.duplicados.length) {
                 msg += `\n\nClientes já compraram hoje:\n- ${data.duplicados.join("\n- ")}`;

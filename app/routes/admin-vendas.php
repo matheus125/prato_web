@@ -78,6 +78,90 @@ function contarSenhasVendidasNoDia($sql, $dataRef)
 */
 }
 
+function tabelaPossuiColuna($sql, $tabela, $coluna)
+{
+    $rows = $sql->select("
+        SELECT COUNT(*) AS total
+        FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+          AND TABLE_NAME = :tabela
+          AND COLUMN_NAME = :coluna
+    ", [
+        ':tabela' => $tabela,
+        ':coluna' => $coluna
+    ]);
+
+    return isset($rows[0]['total']) && (int)$rows[0]['total'] > 0;
+}
+
+function indiceExiste($sql, $tabela, $indice)
+{
+    $rows = $sql->select("
+        SELECT COUNT(*) AS total
+        FROM INFORMATION_SCHEMA.STATISTICS
+        WHERE TABLE_SCHEMA = DATABASE()
+          AND TABLE_NAME = :tabela
+          AND INDEX_NAME = :indice
+    ", [
+        ':tabela' => $tabela,
+        ':indice' => $indice
+    ]);
+
+    return isset($rows[0]['total']) && (int)$rows[0]['total'] > 0;
+}
+
+function prepararEstruturaSenhas($sql)
+{
+    if (tabelaPossuiColuna($sql, 'tb_senhas', 'dedupe_key')) {
+        return true;
+    }
+
+    try {
+        $sql->query("ALTER TABLE tb_senhas ADD COLUMN dedupe_key VARCHAR(80) NULL AFTER id_dependente");
+    } catch (\Exception $e) {
+        relatorioLog("Nao foi possivel adicionar tb_senhas.dedupe_key automaticamente: " . $e->getMessage());
+        return false;
+    }
+
+    try {
+        if (!indiceExiste($sql, 'tb_senhas', 'uq_senhas_data_dedupe')) {
+            $sql->query("CREATE UNIQUE INDEX uq_senhas_data_dedupe ON tb_senhas (data_refeicao, dedupe_key)");
+        }
+    } catch (\Exception $e) {
+        relatorioLog("Nao foi possivel criar indice uq_senhas_data_dedupe automaticamente: " . $e->getMessage());
+    }
+
+    return tabelaPossuiColuna($sql, 'tb_senhas', 'dedupe_key');
+}
+
+function chamarFechamentoAtualizarSeExistir($sql, $dataRef, $limite)
+{
+    try {
+        $rows = $sql->select("
+            SELECT COUNT(*) AS total
+            FROM INFORMATION_SCHEMA.ROUTINES
+            WHERE ROUTINE_SCHEMA = DATABASE()
+              AND ROUTINE_TYPE = 'PROCEDURE'
+              AND ROUTINE_NAME = 'sp_fechamento_atualizar'
+        ");
+
+        if (!isset($rows[0]['total']) || (int)$rows[0]['total'] <= 0) {
+            relatorioLog("Procedure sp_fechamento_atualizar nao encontrada. Fechamento mantido via PHP.");
+            return false;
+        }
+
+        $sql->select("CALL sp_fechamento_atualizar(:data, :limite)", [
+            ":data" => $dataRef,
+            ":limite" => $limite
+        ]);
+
+        return true;
+    } catch (\Exception $e) {
+        relatorioLog("Falha ao chamar sp_fechamento_atualizar: " . $e->getMessage());
+        return false;
+    }
+}
+
 /**
  * Descobre automaticamente qual coluna de data existe em tb_relatorios.
  * (Evita erro "Unknown column data_refeicao".)
@@ -1335,6 +1419,7 @@ $app->post("/admin/api/senhas", function () use ($app) {
     }
 
     $sql = new Sql();
+    $usarDedupeKey = prepararEstruturaSenhas($sql);
 
     $titularJaComprou = false; // usado para permitir venda de dependentes mesmo se titular já comprou
 
@@ -1629,12 +1714,9 @@ $app->post("/admin/api/senhas", function () use ($app) {
                 $statusClienteBanco = 'ATIVO';
             }
 
-            $sql->query("
-                INSERT INTO tb_senhas
-                (cliente, cpf, Idade, Genero, Deficiente, tipoSenha, status_cliente, data_refeicao, id_titular, id_dependente, dedupe_key, registration_date, registration_date_update)
-                VALUES
-                (:cliente, :cpf, :idade, :genero, :deficiente, :tipoSenha, :status_cliente, :data_refeicao, :id_titular, :id_dependente, :dedupe_key, NOW(), NOW())
-            ", [
+            $colunasInsert = "cliente, cpf, Idade, Genero, Deficiente, tipoSenha, status_cliente, data_refeicao, id_titular, id_dependente";
+            $valoresInsert = ":cliente, :cpf, :idade, :genero, :deficiente, :tipoSenha, :status_cliente, :data_refeicao, :id_titular, :id_dependente";
+            $paramsInsert = [
                 ":cliente"        => $cliente,
                 ":cpf"            => $cpf,
                 ":idade"          => $idade,
@@ -1644,9 +1726,21 @@ $app->post("/admin/api/senhas", function () use ($app) {
                 ":status_cliente" => $statusClienteBanco,
                 ":data_refeicao" => $data_refeicao,
                 ":id_titular" => $idTitular,
-                ":id_dependente" => $idDependente,
-                ":dedupe_key" => $dedupeKey
-            ]);
+                ":id_dependente" => $idDependente
+            ];
+
+            if ($usarDedupeKey) {
+                $colunasInsert .= ", dedupe_key";
+                $valoresInsert .= ", :dedupe_key";
+                $paramsInsert[":dedupe_key"] = $dedupeKey;
+            }
+
+            $sql->query("
+                INSERT INTO tb_senhas
+                ({$colunasInsert}, registration_date, registration_date_update)
+                VALUES
+                ({$valoresInsert}, NOW(), NOW())
+            ", $paramsInsert);
 
 
             $row = $sql->select("SELECT LAST_INSERT_ID() AS id");
@@ -1668,10 +1762,7 @@ $app->post("/admin/api/senhas", function () use ($app) {
             'Venda registrada em ' . $data_refeicao . '. Tipo: ' . $tipoSenha . '. Quantidade: ' . count($ids) . '. Senha(s): ' . $senhaImpressa . '. IDs: ' . implode(',', $ids) . '.'
         );
 
-        $sql->select("CALL sp_fechamento_atualizar(:data, :limite)", [
-            ":data" => $data_refeicao,
-            ":limite" => isset($limiteTransacao) ? $limiteTransacao : $LIMITE_SENHAS_DIA
-        ]);
+        chamarFechamentoAtualizarSeExistir($sql, $data_refeicao, isset($limiteTransacao) ? $limiteTransacao : $LIMITE_SENHAS_DIA);
 
 
         // Se fechou agora, tenta gerar/atualizar o relatório do dia em tb_relatorios

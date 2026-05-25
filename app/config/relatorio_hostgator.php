@@ -14,7 +14,7 @@ return array(
     'user' => $user,
     'pass' => $pass,
     'port' => (int) pc_env('RELATORIO_FTP_PORT', 21),
-    'base_path' => pc_env('RELATORIO_REMOTE_DIR', '/public_html/relatorios/'),
+    'base_path' => pc_env('RELATORIO_REMOTE_DIR', '/prato/relatorios'),
     'ftp_host' => $host,
     'ftp_user' => $user,
     'ftp_pass' => $pass
